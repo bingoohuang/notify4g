@@ -5,6 +5,10 @@ go 1.12
 require (
 	github.com/bingoohuang/gou v0.0.0-20190517063404-8f6f8cdae576
 	github.com/bingoohuang/statiq v0.2.1
+	github.com/bxcodec/faker/v3 v3.1.0
+	github.com/mitchellh/go-homedir v1.1.0
+	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/pkg/errors v0.8.0
 	github.com/sirupsen/logrus v1.4.1
 	github.com/tobyzxj/uuid v0.0.0-20140223123307-aa0153c14395
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect

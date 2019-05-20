@@ -1,4 +1,4 @@
-package notify4g
+package api
 
 import (
 	"github.com/bingoohuang/gou"
@@ -18,10 +18,19 @@ type AliyunSms struct {
 	SignName        string `json:"signName"`
 }
 
-// LoadConfig 创建发送器，要求参数 config 是{accessKeyId}/{accessKeySecret}/{templateCode}/{signName}的格式
-func (s *AliyunSms) LoadConfig(config string) error {
+var _ Config = (*AliyunSms)(nil)
+
+// Config 创建发送器，要求参数 config 是{accessKeyId}/{accessKeySecret}/{templateCode}/{signName}的格式
+func (s *AliyunSms) Config(config string) error {
 	s.AccessKeyId, s.AccessKeySecret, s.TemplateCode, s.SignName = gou.Split4(config, "/", true, false)
 	return nil
+}
+
+func (s *AliyunSms) InitMeaning() {
+	s.AccessKeyId = "accessKeyID"
+	s.AccessKeySecret = "acessKeySecret"
+	s.TemplateCode = "短信模板ID，可以不设置，然后在发送时再设置"
+	s.SignName = "短信模签名，不设置使用默认签名，或者在发送时再设置"
 }
 
 type AliyunSmsReq struct {
@@ -47,8 +56,13 @@ type RawAliyunSmsRsp struct {
 	BizId     string // eg. 900619746936498440^0,  发送回执ID，可根据该ID在接口QuerySendDetails中查询具体的发送状态。
 }
 
+func (s AliyunSms) NewRequest() interface{} {
+	return &AliyunSmsReq{}
+}
+
 // Notify 发送短信
-func (s AliyunSms) Notify(req AliyunSmsReq) (*AliyunSmsRsp, error) {
+func (s AliyunSms) Notify(request interface{}) (interface{}, error) {
+	req := request.(AliyunSmsReq)
 	param, outId := s.createParams(req)
 	u, _ := gou.BuildURL("http://dysmsapi.aliyuncs.com/", param)
 

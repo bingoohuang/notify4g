@@ -9,7 +9,11 @@
     <script type="text/javascript" src="/static/codemirror/5.45.0/javascript.min.js"></script>
 
     <style>
-        .margin-10 { margin-top: 1.0em; margin-bottom: 1.0em;}
+        .margin-10 {
+            margin-top: 1.0em;
+            margin-bottom: 1.0em;
+        }
+
         .CodeMirror {
             height: auto;
 
@@ -41,7 +45,7 @@
             /* Bootstrap Settings */
             border-color: #66afe9;
             outline: 0;
-            box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
             transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
         }
 
@@ -49,32 +53,51 @@
 </head>
 <body>
 <div class="container">
-    <div class="page-header">
-        <h3>Notifier List</h3>
-    </div>
-
     <div class="row">
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>Name</th><th>Test</th>
+                <th>#</th>
+                <th>Name</th>
+                <th>Path</th>
+                <th>Test</th>
+                <th>Config</th>
+                <th>Test by Config</th>
             </tr>
             </thead>
             <tbody>
-                <tr><td>阿里云短信</td><td><a url="/aliyunsms" class="testLink">测试</a></td></tr>
-                <tr><td>钉钉机器人</td><td><a url="/dingtalkrobot" class="testLink">测试</a></td></tr>
-                <tr><td>腾讯云短信</td><td><a url="/qcloudSms" class="testLink">测试</a></td></tr>
-                <tr><td>腾讯云语音</td><td><a url="/qcloudVoice" class="testLink">测试</a></td></tr>
-                <tr><td>企业微信</td><td><a url="/qywx" class="testLink">测试</a></td></tr>
-                <tr><td>SMTP邮件</td><td><a url="/mail" class="testLink">测试</a></td></tr>
+            {{range $i, $a := .Items}}
+                <tr>
+                    <td>{{$i}}</td>
+                    <td>{{$a.Name}}</td>
+                    <td class="path">{{$a.Path}}</td>
+                    <td><a class="testLink">测试</a></td>
+                    <td>
+                        {{range $a.ConfigIDs}}
+                            <a title="编辑配置" class="editConfig">{{.}}</a> &nbsp
+                        {{end}}
+                        <a title="编辑配置" class="editConfig New">New</a>
+                    </td>
+
+                    <td>
+                        {{range $a.ConfigIDs}}
+                            <a title="按此配置发送通知" class="configNotify">{{.}}</a> &nbsp
+                        {{end}}
+                    </td>
+                </tr>
+            {{end}}
             </tbody>
         </table>
     </div>
 
-    <div class="row" >
+    <div class="row">
         <textarea id="reqEditor"></textarea>
         <div class="text-center margin-10">
-            <button type="button" id="btnSend" class="btn btn-default">发送</button>
+            <span id="configDiv" style="display: none">
+                ConfigID：<input id="configIDInput" placeholder="Config ID" type="text">
+                &nbsp;
+            </span>
+            <button type="button" id="btnSend"  class="btn btn-default">测试发送</button>
         </div>
     </div>
 
@@ -88,53 +111,148 @@
     $(function () {
         const reqEditor = CodeMirror.fromTextArea(document.getElementById("reqEditor"), {
             mode: 'application/json', lineNumbers: true
-        })
+        });
         const rspEditor = CodeMirror.fromTextArea(document.getElementById("rspEditor"), {
             mode: 'application/json', lineNumbers: true
-        })
-        reqEditor.setValue('{}')
-        rspEditor.setValue('{}')
+        });
+        reqEditor.setValue('{}');
+        rspEditor.setValue('{}');
 
-        let lastRow = null
+        let lastRow = null;
 
-        let url = ""
-        $('.testLink').click(function (event) {
-            event.preventDefault()
-            url = $(this).attr('url')
+        let url = "";
+        let configID = null;
+        let MODE = 0;
 
+
+        const toggleDiv = function () {
+            $('#configDiv').toggle(MODE === 2 || MODE === 3);
+            if (MODE === 2) {
+                $('#btnSend').text("保存配置")
+            } else {
+                $('#btnSend').text("测试发送")
+            }
+        };
+
+        const highlightCurrentRow = function (td) {
             if (lastRow) {
                 lastRow.removeClass('success')
             }
-            lastRow = $(this).parents('tr')
-            lastRow.addClass('success')
+            lastRow = td.parents('tr');
+            lastRow.addClass('success');
+
+            url = td.parents('tr').find('.path').text();
+        };
+
+        $('.testLink').click(function (event) {
+            event.preventDefault();
+            highlightCurrentRow($(this));
+            configID = null
+            MODE = 1;
 
             $.ajax({
                 type: 'GET',
                 url: url,
-                processData: false,
-                data: reqEditor.getValue(),
                 success: function (content) {
-                    reqEditor.setValue(JSON.stringify(JSON.parse(content), null, 4))
+                    reqEditor.setValue(JSON.stringify(content, null, 4));
+                    toggleDiv()
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     alert(jqXHR.responseText + "\nStatus: " + textStatus + "\nError: " + errorThrown)
                 }
             })
-        })
+        });
+
+        $('.editConfig').click(function (event) {
+            event.preventDefault();
+            highlightCurrentRow($(this));
+            configID = $(this).text();
+
+            let editUrl = "";
+            if ($(this).hasClass("New")) {
+                editUrl = /config/ + configID + "/" + url.split(/\//).pop();
+                $('#configIDInput').val("")
+            } else {
+                editUrl = /config/ + configID;
+                $('#configIDInput').val(configID)
+            }
+
+            MODE = 2;
+
+            $.ajax({
+                type: 'GET',
+                url: editUrl,
+                success: function (content) {
+                    reqEditor.setValue(JSON.stringify(content, null, 4));
+                    toggleDiv()
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseText + "\nStatus: " + textStatus + "\nError: " + errorThrown)
+                }
+            })
+        });
+
+        $('.configNotify').click(function (event) {
+            event.preventDefault();
+            highlightCurrentRow($(this));
+            configID = $(this).text();
+            $('#configIDInput').val(configID);
+            MODE = 3;
+
+            $.ajax({
+                type: 'GET',
+                url: /notify/ + configID,
+                success: function (content) {
+                    reqEditor.setValue(JSON.stringify(content, null, 4));
+                    toggleDiv()
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseText + "\nStatus: " + textStatus + "\nError: " + errorThrown)
+                }
+            })
+        });
 
         $('#btnSend').click(function () {
-            $.ajax({
-                type: 'POST',
-                url: url,
-                processData: false,
-                data: reqEditor.getValue(),
-                success: function (content) {
-                    rspEditor.setValue(JSON.stringify(JSON.parse(content), null, 4))
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseText + "\nStatus: " + textStatus + "\nError: " + errorThrown)
-                }
-            })
+            if (MODE === 1) {
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    processData: false,
+                    data: reqEditor.getValue(),
+                    success: function (content) {
+                        rspEditor.setValue(JSON.stringify(content, null, 4))
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert(jqXHR.responseText + "\nStatus: " + textStatus + "\nError: " + errorThrown)
+                    }
+                })
+            } else if (MODE === 2) {
+                $.ajax({
+                    type: 'POST',
+                    url: /config/ + $('#configIDInput').val(),
+                    processData: false,
+                    data: reqEditor.getValue(),
+                    success: function (content) {
+                        rspEditor.setValue(JSON.stringify(content, null, 4))
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert(jqXHR.responseText + "\nStatus: " + textStatus + "\nError: " + errorThrown)
+                    }
+                })
+            } else if (MODE === 3) {
+                $.ajax({
+                    type: 'POST',
+                    url: /notify/ + $('#configIDInput').val(),
+                    processData: false,
+                    data: reqEditor.getValue(),
+                    success: function (content) {
+                        rspEditor.setValue(JSON.stringify(content, null, 4))
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert(jqXHR.responseText + "\nStatus: " + textStatus + "\nError: " + errorThrown)
+                    }
+                })
+            }
         })
     })
 </script>

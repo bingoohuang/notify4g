@@ -1,4 +1,4 @@
-package notify4g
+package api
 
 import (
 	"fmt"

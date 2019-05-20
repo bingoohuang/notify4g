@@ -1,4 +1,4 @@
-package notify4g
+package api
 
 import (
 	"github.com/bingoohuang/gou"
@@ -16,12 +16,22 @@ type Mail struct {
 	Pass     string `json:"pass"`     // ...
 }
 
-// LoadConfig 加载配置
-func (q *Mail) LoadConfig(config string) error {
+var _ Config = (*Mail)(nil)
+
+// Config 加载配置
+func (q *Mail) Config(config string) error {
 	var port string
 	q.SmtpAddr, port, q.From, q.Username, q.Pass = gou.Split5(config, "/", true, false)
 	q.SmtpPort, _ = strconv.Atoi(port)
 	return nil
+}
+
+func (q *Mail) InitMeaning() {
+	q.SmtpAddr = "SMTP地址"
+	q.SmtpPort = 587       // 587
+	q.From = `发送人地址`       // ...@gmail.com
+	q.Username = `邮箱登录用户名` // ...
+	q.Pass = `邮箱登录密码`      // ...
 }
 
 type MailReq struct {
@@ -30,8 +40,14 @@ type MailReq struct {
 	To      []string `json:"to"`
 }
 
+func (q Mail) NewRequest() interface{} {
+	return &MailReq{}
+}
+
 // Notify 发送邮件
-func (q Mail) Notify(r MailReq) (interface{}, error) {
+func (q Mail) Notify(request interface{}) (interface{}, error) {
+	r := request.(MailReq)
+
 	mm := gomail.NewMessage()
 	mm.SetHeader("From", q.From)
 	mm.SetHeader("To", r.To...)

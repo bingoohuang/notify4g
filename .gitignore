@@ -15,3 +15,8 @@ res/bootstrap
 res/jquery
 .idea
 test.json
+.DS_Store
+
+etc/snapshots
+
+notify4g

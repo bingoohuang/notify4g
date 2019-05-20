@@ -1,4 +1,4 @@
-package notify4g
+package api
 
 import (
 	"fmt"
@@ -11,10 +11,16 @@ type Dingtalk struct {
 	AccessToken string `json:"accessToken"`
 }
 
-// LoadConfig 创建发送器，要求参数 config 是{accessToken}的格式
-func (s *Dingtalk) LoadConfig(config string) error {
+var _ Config = (*Dingtalk)(nil)
+
+// Config 创建发送器，要求参数 config 是{accessToken}的格式
+func (s *Dingtalk) Config(config string) error {
 	s.AccessToken = config
 	return nil
+}
+
+func (s *Dingtalk) InitMeaning() {
+	s.AccessToken = "自定义机器人的accessToken"
 }
 
 type DingtalkReq struct {
@@ -23,8 +29,13 @@ type DingtalkReq struct {
 	AtAll     bool     `json:"atAll"`
 }
 
+func (s Dingtalk) NewRequest() interface{} {
+	return &DingtalkReq{}
+}
+
 // Notify 发送信息
-func (s Dingtalk) Notify(req DingtalkReq) (*DingResponse, error) {
+func (s Dingtalk) Notify(request interface{}) (interface{}, error) {
+	req := request.(DingtalkReq)
 	robot := Robot{Webhook: "https://oapi.dingtalk.com/robot/send?access_token=" + s.AccessToken}
 	return robot.SendText(req.Message, req.AtMobiles, req.AtAll)
 }

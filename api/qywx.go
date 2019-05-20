@@ -1,4 +1,4 @@
-package notify4g
+package api
 
 import (
 	"encoding/json"
@@ -66,11 +66,19 @@ type Qywx struct {
 	AgentID    string `json:"agentID"`
 }
 
-// LoadConfig 创建发送器，要求参数 config 是{corpID}/{corpSecret}/{agentID}的格式
-func (s *Qywx) LoadConfig(config string) error {
+var _ Config = (*Qywx)(nil)
+
+// Config 创建发送器，要求参数 config 是{corpID}/{corpSecret}/{agentID}的格式
+func (s *Qywx) Config(config string) error {
 	s.CorpID, s.CorpSecret, s.AgentID = gou.Split3(config, "/", true, false)
 
 	return nil
+}
+
+func (s *Qywx) InitMeaning() {
+	s.CorpID = "corpID"
+	s.CorpSecret = "corpSecret"
+	s.AgentID = "agentID"
 }
 
 type QywxReq struct {
@@ -78,8 +86,13 @@ type QywxReq struct {
 	UserIds []string `json:"userIds"`
 }
 
+func (s Qywx) NewRequest() interface{} {
+	return &QywxReq{}
+}
+
 // Notify 发送企业消息
-func (s Qywx) Notify(r QywxReq) (interface{}, error) {
+func (s Qywx) Notify(request interface{}) (interface{}, error) {
+	r := request.(QywxReq)
 	result, err := FastSendQywxMsg(s.CorpID, s.CorpSecret, s.AgentID, r.Msg, r.UserIds)
 	if err != nil {
 		return nil, err

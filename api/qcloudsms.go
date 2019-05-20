@@ -1,4 +1,4 @@
-package notify4g
+package api
 
 import (
 	"github.com/bingoohuang/gou"
@@ -16,13 +16,22 @@ type QcloudSms struct {
 	Sign  string `json:"sign"`
 }
 
-// LoadConfig 加载配置
-func (q *QcloudSms) LoadConfig(config string) error {
+var _ Config = (*QcloudSms)(nil)
+
+// Config 加载配置
+func (q *QcloudSms) Config(config string) error {
 	var tplID string
 	q.Sdkappid, q.Appkey, tplID, q.Sign = gou.Split4(config, "/", true, false)
 	q.TplID, _ = strconv.Atoi(tplID)
 
 	return nil
+}
+
+func (s *QcloudSms) InitMeaning() {
+	s.Sdkappid = "sdkappid"
+	s.Appkey = "appkey"
+	s.TplID = 157749
+	s.Sign = "短信签名，可以为空"
 }
 
 // Tel 表示电话号码
@@ -63,13 +72,19 @@ type QcloudSmsReq struct {
 	Mobiles []string `json:"mobiles"`
 }
 
+func (q QcloudSms) NewRequest() interface{} {
+	return &QcloudSmsReq{}
+}
+
 // 目前业务埋点监控告警模板如下:
 // 短信模板ID：157749   应用:{1} 监控埋点:{2} 在近{3}分钟内发生{4}, 其中最高{5}, 最低{6}
 // 示例：【北京数字认证】应用:logcenter-flume 监控埋点:events成功写入kafka的数量#mssp_server_sink#192_168_22_1 在近10分钟内发生连续7次请求次数等于0.0, 其中最高2300.0, 最低1800.0
 // 模板 157749 参数列表 ["appName", "key","minutes","counts","max","min"]
 
 // Notify 发送信息
-func (q QcloudSms) Notify(r QcloudSmsReq) (*RawQcloudSmsRsp, error) {
+func (q QcloudSms) Notify(request interface{}) (interface{}, error) {
+	r := request.(QcloudSmsReq)
+
 	rando := gou.RandomIntAsString()
 	// 指定模板群发短信 https://cloud.tencent.com/document/product/382/5977
 	url, _ := gou.BuildURL("https://yun.tim.qq.com/v5/tlssmssvr/sendmultisms2",
