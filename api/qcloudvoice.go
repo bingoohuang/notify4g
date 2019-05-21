@@ -36,7 +36,7 @@ func (s *QcloudVoice) InitMeaning() {
 
 type QcloudVoiceReq struct {
 	Params []string `json:"params"`
-	Mobile string   `json:"mobile"`
+	Mobile string   `json:"mobile" faker:"china_mobile_number"`
 }
 
 type RawQcloudVoiceRsp struct {
@@ -48,10 +48,10 @@ type RawQcloudVoiceRsp struct {
 
 // RawQcloudVoiceReq 表示腾讯云语音短信请求体结构
 type RawQcloudVoiceReq struct {
-	TplID     int      `json:"tpl_id"`               // 模板 ID，在控制台审核通过的模板 ID
-	Params    []string `json:"params"` // 模板参数，若模板没有参数，请提供为空数组
-	PlayTimes int      `json:"playtimes"`            // 播放次数，可选，最多3次，默认2次。
-	Sig       string   `json:"sig"`                  // App 凭证，计算公式：sha256（appkey=$appkey&random=$random&time=$time&mobile=$mobile）
+	TplID     int      `json:"tpl_id"`    // 模板 ID，在控制台审核通过的模板 ID
+	Params    []string `json:"params"`    // 模板参数，若模板没有参数，请提供为空数组
+	PlayTimes int      `json:"playtimes"` // 播放次数，可选，最多3次，默认2次。
+	Sig       string   `json:"sig"`       // App 凭证，计算公式：sha256（appkey=$appkey&random=$random&time=$time&mobile=$mobile）
 	Tel       Tel      `json:"tel"`
 	Time      int64    `json:"time"` // 请求发起时间，UNIX 时间戳（单位：秒），如果和系统时间相差超过 10 分钟则会返回失败
 	Ext       string   `json:"ext"`  // 用户的 session 内容，腾讯 server 回包中会原样返回，可选字段，不需要就填空
@@ -66,7 +66,7 @@ func (q QcloudVoice) NewRequest() interface{} {
 
 // Notify 发送信息
 func (q QcloudVoice) Notify(request interface{}) (interface{}, error) {
-	r := request.(QcloudVoiceReq)
+	r := request.(*QcloudVoiceReq)
 
 	rando := gou.RandomIntAsString()
 	// 发送语音通知 https://cloud.tencent.com/document/product/382/18155

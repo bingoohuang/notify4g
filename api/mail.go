@@ -9,11 +9,11 @@ import (
 
 // Mail 表示邮件发送器
 type Mail struct {
-	SmtpAddr string `json:"smtpAddr"` // smtp.gmail.com
-	SmtpPort int    `json:"smtpPort"` // 587
-	From     string `json:"from"`     // ...@gmail.com
-	Username string `json:"username"` // ...
-	Pass     string `json:"pass"`     // ...
+	SmtpAddr string `json:"smtpAddr"`           // smtp.gmail.com
+	SmtpPort int    `json:"smtpPort"`           // 587
+	From     string `json:"from" faker:"email"` // ...@gmail.com
+	Username string `json:"username"`           // ...
+	Pass     string `json:"pass"`               // ...
 }
 
 var _ Config = (*Mail)(nil)
@@ -37,7 +37,7 @@ func (q *Mail) InitMeaning() {
 type MailReq struct {
 	Subject string   `json:"subject"`
 	Message string   `json:"message"`
-	To      []string `json:"to"`
+	To      []string `json:"to" faker:"email"`
 }
 
 func (q Mail) NewRequest() interface{} {
@@ -46,7 +46,7 @@ func (q Mail) NewRequest() interface{} {
 
 // Notify 发送邮件
 func (q Mail) Notify(request interface{}) (interface{}, error) {
-	r := request.(MailReq)
+	r := request.(*MailReq)
 
 	mm := gomail.NewMessage()
 	mm.SetHeader("From", q.From)

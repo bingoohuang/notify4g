@@ -92,7 +92,7 @@ func (s Qywx) NewRequest() interface{} {
 
 // Notify 发送企业消息
 func (s Qywx) Notify(request interface{}) (interface{}, error) {
-	r := request.(QywxReq)
+	r := request.(*QywxReq)
 	result, err := FastSendQywxMsg(s.CorpID, s.CorpSecret, s.AgentID, r.Msg, r.UserIds)
 	if err != nil {
 		return nil, err

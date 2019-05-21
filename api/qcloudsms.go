@@ -12,8 +12,9 @@ import (
 // QcloudSms 表示腾讯云短信发送器
 type QcloudSms struct {
 	QcloudBase
-	TplID int    `json:"tplID"`
-	Sign  string `json:"sign"`
+	TplID        int      `json:"tplID"`
+	Sign         string   `json:"sign" faker:"-"`
+	TmplVarNames []string `json:"tmplVarNames"`
 }
 
 var _ Config = (*QcloudSms)(nil)
@@ -32,20 +33,21 @@ func (s *QcloudSms) InitMeaning() {
 	s.Appkey = "appkey"
 	s.TplID = 157749
 	s.Sign = "短信签名，可以为空"
+	s.TmplVarNames = []string{"var1", "var2"}
 }
 
 // Tel 表示电话号码
 type Tel struct {
-	Mobile     string `json:"mobile"`
+	Mobile     string `json:"mobile" faker:"china_mobile_number"`
 	NationCode string `json:"nationcode"`
 }
 
 // RawQcloudSmsReq 表示腾讯云短消息请求体结构
 type RawQcloudSmsReq struct {
-	Ext    string   `json:"ext"`    // 用户的 session 内容，腾讯 server 回包中会原样返回，可选字段，不需要就填空
-	Params []string `json:"params"` // 模板参数，若模板没有参数，请提供为空数组
-	Sig    string   `json:"sig"`    // App 凭证，计算公式：sha256（appkey=$appkey&random=$random&time=$time&mobile=$mobile）
-	Sign   string   `json:"sign"`   // 短信签名，如果使用默认签名，该字段可缺省
+	Ext    string   `json:"ext"`            // 用户的 session 内容，腾讯 server 回包中会原样返回，可选字段，不需要就填空
+	Params []string `json:"params"`         // 模板参数，若模板没有参数，请提供为空数组
+	Sig    string   `json:"sig"`            // App 凭证，计算公式：sha256（appkey=$appkey&random=$random&time=$time&mobile=$mobile）
+	Sign   string   `json:"sign" faker:"-"` // 短信签名，如果使用默认签名，该字段可缺省
 	Tel    []Tel    `json:"tel"`
 	Time   int64    `json:"time"`   // 请求发起时间，UNIX 时间戳（单位：秒），如果和系统时间相差超过 10 分钟则会返回失败
 	TplID  int      `json:"tpl_id"` // 模板 ID，在控制台审核通过的模板 ID
@@ -53,7 +55,7 @@ type RawQcloudSmsReq struct {
 
 type RawQcloudSmsRspDetail struct {
 	Fee        int    `json:"fee"`
-	Mobile     string `json:"mobile"`
+	Mobile     string `json:"mobile" faker:"china_mobile_number"`
 	Nationcode string `json:"nationcode"`
 	Sid        string `json:"sid"`
 	Result     int    `json:"result"`
@@ -69,7 +71,7 @@ type RawQcloudSmsRsp struct {
 
 type QcloudSmsReq struct {
 	Params  []string `json:"params"`
-	Mobiles []string `json:"mobiles"`
+	Mobiles []string `json:"mobiles" faker:"china_mobile_number"`
 }
 
 func (q QcloudSms) NewRequest() interface{} {
@@ -83,7 +85,29 @@ func (q QcloudSms) NewRequest() interface{} {
 
 // Notify 发送信息
 func (q QcloudSms) Notify(request interface{}) (interface{}, error) {
-	r := request.(QcloudSmsReq)
+	rsp, _, err := q.NotifySms(request)
+	return rsp, err
+}
+
+var _ SmsNotifier = (*QcloudSms)(nil)
+
+func (q QcloudSms) ConvertRequest(r *SmsReq) interface{} {
+	params := make([]string, len(q.TmplVarNames))
+	for i, k := range q.TmplVarNames {
+		if v, ok := r.TemplateParams[k]; ok {
+			params[i] = v
+		}
+	}
+
+	return &QcloudSmsReq{
+		Params:  params,
+		Mobiles: r.Mobiles,
+	}
+}
+
+// NotifySms 发送短信
+func (q QcloudSms) NotifySms(request interface{}) (interface{}, bool, error) {
+	r := request.(*QcloudSmsReq)
 
 	rando := gou.RandomIntAsString()
 	// 指定模板群发短信 https://cloud.tencent.com/document/product/382/5977
@@ -110,8 +134,8 @@ func (q QcloudSms) Notify(request interface{}) (interface{}, error) {
 	_, err := gou.RestPost(url, req, &rawRsp)
 	if err != nil {
 		logrus.Debugf("post error %v", err)
-		return nil, err
+		return nil, false, err
 	}
 
-	return &rawRsp, nil
+	return &rawRsp, rawRsp.Result == 0, nil
 }

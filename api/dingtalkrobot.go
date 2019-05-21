@@ -25,7 +25,7 @@ func (s *Dingtalk) InitMeaning() {
 
 type DingtalkReq struct {
 	Message   string   `json:"message"`
-	AtMobiles []string `json:"atMobiles"`
+	AtMobiles []string `json:"atMobiles" faker:"china_mobile_number"`
 	AtAll     bool     `json:"atAll"`
 }
 
@@ -35,7 +35,7 @@ func (s Dingtalk) NewRequest() interface{} {
 
 // Notify 发送信息
 func (s Dingtalk) Notify(request interface{}) (interface{}, error) {
-	req := request.(DingtalkReq)
+	req := request.(*DingtalkReq)
 	robot := Robot{Webhook: "https://oapi.dingtalk.com/robot/send?access_token=" + s.AccessToken}
 	return robot.SendText(req.Message, req.AtMobiles, req.AtAll)
 }

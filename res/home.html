@@ -71,17 +71,17 @@
                     <td>{{$i}}</td>
                     <td>{{$a.Name}}</td>
                     <td class="path">{{$a.Path}}</td>
-                    <td><a class="testLink">测试</a></td>
+                    <td><a class="testLink">Test</a></td>
                     <td>
                         {{range $a.ConfigIDs}}
-                            <a title="编辑配置" class="editConfig">{{.}}</a> &nbsp
+                            <a title="Edit Config" class="editConfig">{{.}}</a>
                         {{end}}
-                        <a title="编辑配置" class="editConfig New">New</a>
+                        <a title="New Config" class="editConfig New">+</a>
                     </td>
 
                     <td>
                         {{range $a.ConfigIDs}}
-                            <a title="按此配置发送通知" class="configNotify">{{.}}</a> &nbsp
+                            <a title="Test notify by this config" class="configNotify">{{.}}</a>
                         {{end}}
                     </td>
                 </tr>
@@ -97,7 +97,8 @@
                 ConfigID：<input id="configIDInput" placeholder="Config ID" type="text">
                 &nbsp;
             </span>
-            <button type="button" id="btnSend"  class="btn btn-default">测试发送</button>
+            <button type="button" id="btnSend" class="btn btn-default">Test Notify</button>
+            <button type="button" id="btnDelete" class="btn btn-default" style="display: none;">Drop Config</button>
         </div>
     </div>
 
@@ -128,10 +129,12 @@
         const toggleDiv = function () {
             $('#configDiv').toggle(MODE === 2 || MODE === 3);
             if (MODE === 2) {
-                $('#btnSend').text("保存配置")
+                $('#btnSend').text("Save Config")
             } else {
-                $('#btnSend').text("测试发送")
+                $('#btnSend').text("Test Notify")
             }
+
+            $('#btnDelete').toggle(MODE === 2)
         };
 
         const highlightCurrentRow = function (td) {
@@ -155,6 +158,7 @@
                 url: url,
                 success: function (content) {
                     reqEditor.setValue(JSON.stringify(content, null, 4));
+                    rspEditor.setValue('{}');
                     toggleDiv()
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -184,6 +188,7 @@
                 url: editUrl,
                 success: function (content) {
                     reqEditor.setValue(JSON.stringify(content, null, 4));
+                    rspEditor.setValue('{}');
                     toggleDiv()
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -204,6 +209,7 @@
                 url: /notify/ + configID,
                 success: function (content) {
                     reqEditor.setValue(JSON.stringify(content, null, 4));
+                    rspEditor.setValue('{}');
                     toggleDiv()
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -253,7 +259,21 @@
                     }
                 })
             }
-        })
+        });
+
+        $('#btnDelete').click(function () {
+            $.ajax({
+                type: 'DELETE',
+                url: /config/ + $('#configIDInput').val(),
+                success: function (content) {
+                    rspEditor.setValue(JSON.stringify(content, null, 4))
+                    document.location.reload()
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseText + "\nStatus: " + textStatus + "\nError: " + errorThrown)
+                }
+            })
+        });
     })
 </script>
 

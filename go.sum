@@ -6,12 +6,14 @@ github.com/araddon/dateparse v0.0.0-20190510211750-d2ba70357e92 h1:29yos9+rhKruI
 github.com/araddon/dateparse v0.0.0-20190510211750-d2ba70357e92/go.mod h1:SLqhdZcd+dF3TEVL2RMoob5bBP5R1P1qkox+HtCBgGI=
 github.com/averagesecurityguy/random v0.0.0-20180326012618-37cce341d2af h1:P1psVDaUckBRYLjODu1JLr/ECxWPWwYrbEaa5g7IqSM=
 github.com/averagesecurityguy/random v0.0.0-20180326012618-37cce341d2af/go.mod h1:xlqW8P0gOqVMB8Kp0mMuUznEi1PzjF+mhHTSC+ymalU=
+github.com/bingoohuang/faker v0.0.0-20190521064402-b511a003bb97 h1:27fAMZh9vlhes9Y7Ls/INKfkanFka4eTUwAw/07l33I=
+github.com/bingoohuang/faker v0.0.0-20190521064402-b511a003bb97/go.mod h1:grQoZp6gn2mJE18s8Ikq0YtdTI6dBOBpyktUz698IkY=
+github.com/bingoohuang/faker v0.0.0-20190521065953-fd0e11fac0c8 h1:2NbgblSOz/d97ilFy1lRj3CDS8b4VW18PZ4fqNtLvHc=
+github.com/bingoohuang/faker v0.0.0-20190521065953-fd0e11fac0c8/go.mod h1:Ou5FXGYOYO8iuFGhjumYe3rEor+mrPXk8yknJikmnvE=
 github.com/bingoohuang/gou v0.0.0-20190517063404-8f6f8cdae576 h1:3TY1nwwTUT/gX0kkiD7gtU0UdbrJY2b5RX7xI7veQDk=
 github.com/bingoohuang/gou v0.0.0-20190517063404-8f6f8cdae576/go.mod h1:xnbjSDSqE2ZNZ0w67WJ6VBayCYRinZnozXgS4Uoqyzo=
 github.com/bingoohuang/statiq v0.2.1 h1:L7Uya0pM+wbw4CYkF9DVMJ0h0aSUx4mb0X7udk/M7NA=
 github.com/bingoohuang/statiq v0.2.1/go.mod h1:0b9LPVgSSJpbpSBpJqUH7GnuwbYisd32WPxXIo5AMHQ=
-github.com/bxcodec/faker/v3 v3.1.0 h1:VCCPusvvk1My6RjWFnqVbh6EdHDqjWmrHJCHduUksV0=
-github.com/bxcodec/faker/v3 v3.1.0/go.mod h1:gF31YgnMSMKgkvl+fyEo1xuSMbEuieyqfeslGYFjneM=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -39,6 +41,8 @@ github.com/lestrrat-go/file-rotatelogs v2.2.0+incompatible h1:eXEwY0f2h6mcobdAxm
 github.com/lestrrat-go/file-rotatelogs v2.2.0+incompatible/go.mod h1:ZQnN8lSECaebrkQytbHj4xNgtg8CR7RYXnPok8e0EHA=
 github.com/lestrrat-go/strftime v0.0.0-20180821113735-8b31f9c59b0f h1:/o/LRlB6dBTBNViFglNdGfsDHBjdL8Yvfm7qQE4ZUh0=
 github.com/lestrrat-go/strftime v0.0.0-20180821113735-8b31f9c59b0f/go.mod h1:RMlXygAD3c48Psmr06d2G75L4E4xxzxkIe/+ppX9eAU=
+github.com/lucasjones/reggen v0.0.0-20180717132126-cdb49ff09d77 h1:6xiz3+ZczT3M4+I+JLpcPGG1bQKm8067HktB17EDWEE=
+github.com/lucasjones/reggen v0.0.0-20180717132126-cdb49ff09d77/go.mod h1:5ELEyG+X8f+meRWHuqUOewBOhvHkl7M76pdGEansxW4=
 github.com/lunny/log v0.0.0-20160921050905-7887c61bf0de h1:nyxwRdWHAVxpFcDThedEgQ07DbcRc5xgNObtbTp76fk=
 github.com/lunny/log v0.0.0-20160921050905-7887c61bf0de/go.mod h1:3q8WtuPQsoRbatJuy3nvq/hRSvuBJrHHr+ybPPiNvHQ=
 github.com/mattn/go-isatty v0.0.7 h1:UvyT9uN+3r7yLEYSlJsbQGdsaB/a0DlgWP3pql6iwOc=

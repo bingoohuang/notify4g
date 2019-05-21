@@ -3,9 +3,9 @@ module notify4g
 go 1.12
 
 require (
+	github.com/bingoohuang/faker v0.0.0-20190521065953-fd0e11fac0c8
 	github.com/bingoohuang/gou v0.0.0-20190517063404-8f6f8cdae576
 	github.com/bingoohuang/statiq v0.2.1
-	github.com/bxcodec/faker/v3 v3.1.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.8.0

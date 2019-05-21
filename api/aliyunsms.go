@@ -15,7 +15,7 @@ type AliyunSms struct {
 	AccessKeyId     string `json:"accessKeyID"`
 	AccessKeySecret string `json:"acessKeySecret"`
 	TemplateCode    string `json:"templateCode"`
-	SignName        string `json:"signName"`
+	SignName        string `json:"signName" faker:"-"`
 }
 
 var _ Config = (*AliyunSms)(nil)
@@ -34,10 +34,10 @@ func (s *AliyunSms) InitMeaning() {
 }
 
 type AliyunSmsReq struct {
-	TemplateCode   string            `json:"templateCode"`
+	TemplateCode   string            `json:"templateCode" faker:"-"`
 	TemplateParams map[string]string `json:"templateParams"`
-	SignName       string            `json:"signName"`
-	Mobiles        []string          `json:"mobiles"`
+	SignName       string            `json:"signName" faker:"-"`
+	Mobiles        []string          `json:"mobiles" faker:"china_mobile_number"`
 }
 
 type AliyunSmsRsp struct {
@@ -62,7 +62,22 @@ func (s AliyunSms) NewRequest() interface{} {
 
 // Notify 发送短信
 func (s AliyunSms) Notify(request interface{}) (interface{}, error) {
-	req := request.(AliyunSmsReq)
+	smsRsp, _, err := s.NotifySms(request)
+	return smsRsp, err
+}
+
+var _ SmsNotifier = (*AliyunSms)(nil)
+
+func (s AliyunSms) ConvertRequest(r *SmsReq) interface{} {
+	return &AliyunSmsReq{
+		TemplateParams: r.TemplateParams,
+		Mobiles:        r.Mobiles,
+	}
+}
+
+// NotifySms 发送短信
+func (s AliyunSms) NotifySms(request interface{}) (interface{}, bool, error) {
+	req := request.(*AliyunSmsReq)
 	param, outId := s.createParams(req)
 	u, _ := gou.BuildURL("http://dysmsapi.aliyuncs.com/", param)
 
@@ -70,15 +85,16 @@ func (s AliyunSms) Notify(request interface{}) (interface{}, error) {
 	err := gou.RestGet(u, &r)
 	if err != nil {
 		logrus.Warnf("RestGet fail on url %s, error %v", u, err)
-		return nil, err
+		return nil, false, err
 	}
 
 	smsRsp := &AliyunSmsRsp{OutId: outId, Code: r.Code, Message: r.Message, RequestId: r.RequestId, BizId: r.BizId}
-	return smsRsp, err
+	return smsRsp, smsRsp.Code == "OK", err
+
 }
 
 // api doc: https://help.aliyun.com/document_detail/101414.html?spm=a2c4g.11186623.6.616.1eee202a1PxPlf
-func (s AliyunSms) createParams(req AliyunSmsReq) (map[string]string, string) {
+func (s AliyunSms) createParams(req *AliyunSmsReq) (map[string]string, string) {
 	outId := gou.RandomString(16)
 	param := map[string]string{
 		"SignatureMethod":  "HMAC-SHA1", // 以下 系统参数
