@@ -7,10 +7,9 @@ import (
 
 // Sms 表示聚合短信发送器
 type Sms struct {
-	ConfigIds   []string           `json:"configIds"`
-	Random      bool               `json:"random"` // 是否在发送配置中随机发送，不随机时，按照配置顺序发送
-	Retry       int                `json:"retry"`  // 在发送配置中，重试n次
-	ConfigCache *NotifyConfigCache `json:"-"`
+	ConfigIds []string `json:"configIds"`
+	Random    bool     `json:"random"`          // 是否在发送配置中随机发送，不随机时，按照配置顺序发送
+	Retry     int      `json:"retry" faker:"-"` // 在发送配置中，重试n次
 }
 
 var _ Config = (*Sms)(nil)
@@ -28,7 +27,7 @@ func (r *Sms) InitMeaning() {
 type SmsReq struct {
 	TemplateParams map[string]string `json:"templateParams"`
 	Mobiles        []string          `json:"mobiles" faker:"china_mobile_number"`
-	Retry          int               `json:"retry"` // 在发送配置中，重试n次, -1表示使用默认配置
+	Retry          int               `json:"retry" faker:"-"` // 在发送配置中，重试n次, -1表示使用默认配置
 }
 
 func (r Sms) NewRequest() interface{} {
@@ -44,42 +43,52 @@ type SmsNotifier interface {
 func (r Sms) Notify(request interface{}) (interface{}, error) {
 	req := request.(*SmsReq)
 
+	retry := 0
+	maxRetry := r.maxRetryTimes(req)
+
+	var rsp interface{}
+	var err error
+
+	f := func(configID string) bool {
+		nc := ConfigCache.Read(configID)
+		if nc == nil {
+			err = fmt.Errorf("configID %s not found", configID)
+			return true // stop loop
+		}
+
+		var yes bool
+		if smsNotifier, ok := nc.Config.(SmsNotifier); !ok {
+			err = fmt.Errorf("configID %s not a SmsNotifier config", configID)
+			return true // stop loop
+		} else if rsp, yes, err = smsNotifier.NotifySms(smsNotifier.ConvertRequest(req)); yes {
+			return true // stop loop
+		}
+
+		if retry < maxRetry {
+			retry++
+			return false // continue loop
+		} else {
+			return true // stop loop
+		}
+	}
+
+	start := r.startIndex()
+	gou.IterateSlice(r.ConfigIds, start, f)
+
+	return rsp, err
+}
+
+func (r Sms) maxRetryTimes(req *SmsReq) int {
 	retryTimes := req.Retry
 	if retryTimes < 0 {
 		retryTimes = r.Retry
 	}
+	return retryTimes
+}
 
-	retry := 0
-	start := 0
+func (r Sms) startIndex() int {
 	if r.Random {
-		start = gou.RandomIntN(uint64(len(r.ConfigIds)))
+		return gou.RandomIntN(uint64(len(r.ConfigIds)))
 	}
-
-	var err error
-	var rsp interface{}
-
-	gou.IterateSlice(r.ConfigIds, start, func(configID string) bool {
-		notifyConfig := r.ConfigCache.Read(configID)
-		if notifyConfig == nil {
-			err = fmt.Errorf("configID %s not found", configID)
-			return true
-		}
-
-		var yes bool
-		if smsNotifier, ok := notifyConfig.Config.(SmsNotifier); !ok {
-			err = fmt.Errorf("configID %s not a SmsNotifier config", configID)
-			return true
-		} else if rsp, yes, err = smsNotifier.NotifySms(smsNotifier.ConvertRequest(req)); yes {
-			return true
-		}
-
-		if retry < retryTimes {
-			retry++
-			return false
-		} else {
-			return true
-		}
-	})
-
-	return nil, err
+	return 0
 }

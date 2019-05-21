@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/bingoohuang/gou"
+	"strings"
 
 	"strconv"
 	"time"
@@ -22,8 +23,10 @@ var _ Config = (*QcloudSms)(nil)
 // Config 加载配置
 func (q *QcloudSms) Config(config string) error {
 	var tplID string
-	q.Sdkappid, q.Appkey, tplID, q.Sign = gou.Split4(config, "/", true, false)
+	var varNames string
+	q.Sdkappid, q.Appkey, tplID, q.Sign, varNames = gou.Split5(config, "/", true, false)
 	q.TplID, _ = strconv.Atoi(tplID)
+	q.TmplVarNames = strings.SplitN(varNames, "-", -1)
 
 	return nil
 }
