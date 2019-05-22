@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/bingoohuang/gou"
 	"github.com/sirupsen/logrus"
+	"strings"
 
 	"strconv"
 	"time"
@@ -11,18 +12,20 @@ import (
 // QcloudVoice 表示腾讯语音短信发送器
 type QcloudVoice struct {
 	QcloudBase
-	TplID     int `json:"tplID"`
-	PlayTimes int `json:"playTimes"`
+	TplID        int      `json:"tplID"`
+	PlayTimes    int      `json:"playTimes"`
+	TmplVarNames []string `json:"tmplVarNames"`
 }
 
 var _ Config = (*QcloudVoice)(nil)
 
 // Config 加载配置
 func (q *QcloudVoice) Config(config string) error {
-	var tplID, playTimes string
-	q.Sdkappid, q.Appkey, tplID, playTimes = gou.Split4(config, "/", true, false)
+	var tplID, playTimes, varNames string
+	q.Sdkappid, q.Appkey, tplID, playTimes, varNames = gou.Split5(config, "/", true, false)
 	q.TplID, _ = strconv.Atoi(tplID)
 	q.PlayTimes, _ = strconv.Atoi(playTimes)
+	q.TmplVarNames = strings.SplitN(varNames, "-", -1)
 
 	return nil
 }
@@ -35,8 +38,8 @@ func (s *QcloudVoice) InitMeaning() {
 }
 
 type QcloudVoiceReq struct {
-	Params []string `json:"params"`
-	Mobile string   `json:"mobile" faker:"china_mobile_number"`
+	Params map[string]string `json:"params"`
+	Mobile string            `json:"mobile" faker:"china_mobile_number"`
 }
 
 type RawQcloudVoiceRsp struct {
@@ -83,7 +86,7 @@ func (q QcloudVoice) Notify(request interface{}) NotifyRsp {
 
 	req := &RawQcloudVoiceReq{
 		TplID:     q.TplID,
-		Params:    r.Params,
+		Params:    q.ConvertRequest(r.Params),
 		PlayTimes: q.PlayTimes,
 		Sig:       q.CreateSignature(rando, t, r.Mobile),
 		Tel:       Tel{Mobile: r.Mobile, NationCode: "86"},
@@ -94,4 +97,15 @@ func (q QcloudVoice) Notify(request interface{}) NotifyRsp {
 	_, err := gou.RestPost(url, req, &rsp)
 
 	return MakeRsp(err, rsp.Result == 0, q.ChannelName(), rsp)
+}
+
+func (q QcloudVoice) ConvertRequest(r map[string]string) []string {
+	params := make([]string, len(q.TmplVarNames))
+	for i, k := range q.TmplVarNames {
+		if v, ok := r[k]; ok {
+			params[i] = v
+		}
+	}
+
+	return params
 }
