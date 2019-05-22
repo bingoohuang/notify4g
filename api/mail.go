@@ -44,8 +44,12 @@ func (q Mail) NewRequest() interface{} {
 	return &MailReq{}
 }
 
+func (q Mail) ChannelName() string {
+	return "Mail"
+}
+
 // Notify 发送邮件
-func (q Mail) Notify(request interface{}) (interface{}, error) {
+func (q Mail) Notify(request interface{}) NotifyRsp {
 	r := request.(*MailReq)
 
 	mm := gomail.NewMessage()
@@ -57,5 +61,6 @@ func (q Mail) Notify(request interface{}) (interface{}, error) {
 	d := gomail.NewDialer(q.SmtpAddr, q.SmtpPort, q.Username, q.Pass)
 
 	// Notify the email to Bob, Cora and Dan.
-	return nil, d.DialAndSend(mm)
+	err := d.DialAndSend(mm)
+	return MakeRsp(err, err == nil, q.ChannelName(), nil)
 }

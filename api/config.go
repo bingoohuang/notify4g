@@ -12,7 +12,8 @@ import (
 
 type Config interface {
 	Config(config string) error
-	Notify(req interface{}) (interface{}, error)
+	Notify(req interface{}) NotifyRsp
+	ChannelName() string
 	InitMeaning()
 	NewRequest() interface{}
 }
@@ -65,46 +66,28 @@ type NotifyConfig struct {
 }
 
 func NewConfig(typ string) (Config, error) {
-	var v Config
-	switch typ {
-	case "aliyunsms":
-		v = &AliyunSms{}
-	case "dingtalkrobot":
-		v = &Dingtalk{}
-	case "qcloudsms":
-		v = &QcloudSms{}
-	case "qcloudvoice":
-		v = &QcloudVoice{}
-	case "qywx":
-		v = &Qywx{}
-	case "mail":
-		v = &Mail{}
-	case "sms":
-		v = &Sms{}
-	default:
-		return nil, errors.New("unknown config type " + typ)
+	v := gou.Decode(typ, "aliyunsms", &AliyunSms{}, "dingtalkrobot", &Dingtalk{},
+		"qcloudsms", &QcloudSms{}, "qcloudvoice", &QcloudVoice{}, "qywx", &Qywx{}, "mail", &Mail{}, "sms", &Sms{})
+	if v != nil {
+		return v.(Config), nil
 	}
-
-	return v, nil
+	return nil, errors.New("unknown config type " + typ)
 }
 
-func NotifyByConfig(path string) func(w http.ResponseWriter, r *http.Request) {
+func NotifyByConfig(removePath string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		p := r.URL.Path[len(path):]
-		subs := strings.SplitN(p, "/", -1)
-
-		l := len(subs)
-		if l != 1 {
+		subs := strings.SplitN(r.URL.Path[len(removePath):], "/", -1)
+		if len(subs) != 1 {
 			WriteErrorJSON(400, w, Rsp{Status: 400, Message: "invalid path"})
 			return
 		}
 		configId := subs[0]
 
 		switch r.Method {
-		case "POST":
-			postNotify(w, r, configId)
 		case "GET":
 			prepareNotify(w, configId)
+		case "POST":
+			postNotify(w, r, configId)
 		default:
 			WriteErrorJSON(404, w, Rsp{Status: 404, Message: "Not Found"})
 		}
@@ -133,21 +116,18 @@ func postNotify(w http.ResponseWriter, r *http.Request, configId string) error {
 		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: err.Error()})
 	}
 
-	rsp, err := NotifyByConfigID(configId, req)
-	if err != nil {
-		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: err.Error()})
-	}
+	rsp := NotifyByConfigID(configId, req)
 	return WriteJSON(w, rsp)
 }
 
-func NotifyByConfigID(configId string, req interface{}) (interface{}, error) {
+func NotifyByConfigID(configId string, req interface{}) NotifyRsp {
 	c := ConfigCache.Read(configId)
 	if c == nil {
-		return nil, fmt.Errorf("configId %s not found", configId)
+		return MakeRsp(fmt.Errorf("configId %s not found", configId), false, "", nil)
 	}
 
-	rsp, err := c.Config.Notify(req)
-	return rsp, err
+	rsp := c.Config.Notify(req)
+	return rsp
 }
 
 func ServeByConfig(path string) func(w http.ResponseWriter, r *http.Request) {
@@ -188,14 +168,13 @@ func PostConfig(w http.ResponseWriter, r *http.Request, l int, subs []string) er
 		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: "invalid path"})
 	}
 
-	configId := subs[0]
-
 	content := gou.ReadObjectBytes(r.Body)
 	config, err := ParseNotifyConfig(content)
 	if err != nil {
 		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: err.Error()})
 	}
 
+	configId := subs[0]
 	ConfigCache.Write(configId, config, true)
 	return WriteJSON(w, Rsp{Status: 200, Message: "OK"})
 }
@@ -213,7 +192,6 @@ func GetConfig(w http.ResponseWriter, l int, subs []string) error {
 
 		config.InitMeaning()
 		return WriteJSON(w, NotifyConfig{Type: subs[1], Config: config})
-
 	}
 
 	c := ConfigCache.Read(configId)

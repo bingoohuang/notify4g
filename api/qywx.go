@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"errors"
 	"github.com/bingoohuang/gou"
 	"github.com/sirupsen/logrus"
@@ -40,20 +39,21 @@ func GetQywxAccessToken(corpID, corpSecret string) (string, error) {
 
 // https://qydev.weixin.qq.com/wiki/index.php?title=发送接口说明
 // SendQywxMsg 发送企业微信消息
-func SendQywxMsg(accessToken, agentID, content string, userIds []string) ([]byte, error) {
+func SendQywxMsg(accessToken, agentID, content string, userIds []string) (QywxRsp, error) {
 	touser := strings.Join(userIds, "|")
 	msg := map[string]interface{}{
 		"touser": touser, "msgtype": "text", "agentid": agentID, "safe": 0,
 		"text": map[string]string{"content": content}}
-	ret, err := gou.RestPost("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token="+accessToken, msg, nil)
-	return ret, err
+	var rsp QywxRsp
+	_, err := gou.RestPost("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token="+accessToken, msg, &rsp)
+	return rsp, err
 }
 
 // FastSendQywxMsg 快速发送企业微信消息
-func FastSendQywxMsg(corpID, corpSecret, agentID, content string, userIds []string) ([]byte, error) {
+func FastSendQywxMsg(corpID, corpSecret, agentID, content string, userIds []string) (QywxRsp, error) {
 	token, err := GetQywxAccessToken(corpID, corpSecret)
 	if err != nil {
-		return nil, err
+		return QywxRsp{}, err
 	}
 
 	return SendQywxMsg(token, agentID, content, userIds)
@@ -86,17 +86,26 @@ type QywxReq struct {
 	UserIds []string `json:"userIds"`
 }
 
+type QywxRsp struct {
+	Errocode     int    `json:"errcode"`
+	Errmsg       string `json:"errmsg"`
+	Invaliduser  string `json:"invaliduser"`
+	Invalidparty string `json:"invalidparty"`
+	Invalidtag   string `json:"invalidtag"`
+}
+
 func (s Qywx) NewRequest() interface{} {
 	return &QywxReq{}
 }
 
-// Notify 发送企业消息
-func (s Qywx) Notify(request interface{}) (interface{}, error) {
-	r := request.(*QywxReq)
-	result, err := FastSendQywxMsg(s.CorpID, s.CorpSecret, s.AgentID, r.Msg, r.UserIds)
-	if err != nil {
-		return nil, err
-	}
+func (s Qywx) ChannelName() string {
+	return "Qywx"
+}
 
-	return json.RawMessage(result), nil
+// Notify 发送企业消息
+func (s Qywx) Notify(request interface{}) NotifyRsp {
+	r := request.(*QywxReq)
+	rsp, err := FastSendQywxMsg(s.CorpID, s.CorpSecret, s.AgentID, r.Msg, r.UserIds)
+
+	return MakeRsp(err, rsp.Errocode == 0 && rsp.Errmsg == "ok", s.ChannelName(), rsp)
 }

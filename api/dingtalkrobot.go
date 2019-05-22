@@ -23,6 +23,10 @@ func (s *Dingtalk) InitMeaning() {
 	s.AccessToken = "自定义机器人的accessToken"
 }
 
+func (s Dingtalk) ChannelName() string {
+	return "Dingtalk"
+}
+
 type DingtalkReq struct {
 	Message   string   `json:"message"`
 	AtMobiles []string `json:"atMobiles" faker:"china_mobile_number"`
@@ -34,10 +38,11 @@ func (s Dingtalk) NewRequest() interface{} {
 }
 
 // Notify 发送信息
-func (s Dingtalk) Notify(request interface{}) (interface{}, error) {
+func (s Dingtalk) Notify(request interface{}) NotifyRsp {
 	req := request.(*DingtalkReq)
 	robot := Robot{Webhook: "https://oapi.dingtalk.com/robot/send?access_token=" + s.AccessToken}
-	return robot.SendText(req.Message, req.AtMobiles, req.AtAll)
+	rsp, err := robot.SendText(req.Message, req.AtMobiles, req.AtAll)
+	return MakeRsp(err, rsp.Errcode == 0, s.ChannelName(), rsp)
 }
 
 // api https://open-doc.dingtalk.com/microapp/serverapi2/qf2nxq
@@ -57,7 +62,7 @@ type Robot struct {
 }
 
 // SendText send a text type message.
-func (r Robot) SendText(content string, atMobiles []string, isAtAll bool) (*DingResponse, error) {
+func (r Robot) SendText(content string, atMobiles []string, isAtAll bool) (DingResponse, error) {
 	return r.send(&textMessage{
 		MsgType: msgTypeText,
 		Text:    textParams{Content: content},
@@ -66,7 +71,7 @@ func (r Robot) SendText(content string, atMobiles []string, isAtAll bool) (*Ding
 }
 
 // SendLink send a link type message.
-func (r Robot) SendLink(title, text, messageURL, picURL string) (*DingResponse, error) {
+func (r Robot) SendLink(title, text, messageURL, picURL string) (DingResponse, error) {
 	return r.send(&linkMessage{
 		MsgType: msgTypeLink,
 		Link:    linkParams{Title: title, Text: text, MessageURL: messageURL, PicURL: picURL},
@@ -74,7 +79,7 @@ func (r Robot) SendLink(title, text, messageURL, picURL string) (*DingResponse, 
 }
 
 // SendMarkdown send a markdown type message.
-func (r Robot) SendMarkdown(title, text string, atMobiles []string, isAtAll bool) (*DingResponse, error) {
+func (r Robot) SendMarkdown(title, text string, atMobiles []string, isAtAll bool) (DingResponse, error) {
 	return r.send(&markdownMessage{
 		MsgType:  msgTypeMarkdown,
 		Markdown: markdownParams{Title: title, Text: text},
@@ -83,7 +88,7 @@ func (r Robot) SendMarkdown(title, text string, atMobiles []string, isAtAll bool
 }
 
 // SendActionCard send a action card type message.
-func (r Robot) SendActionCard(title, text, singleTitle, singleURL, btnOrientation, hideAvatar string) (*DingResponse, error) {
+func (r Robot) SendActionCard(title, text, singleTitle, singleURL, btnOrientation, hideAvatar string) (DingResponse, error) {
 	return r.send(&actionCardMessage{
 		MsgType:    msgTypeActionCard,
 		ActionCard: actionCardParams{Title: title, Text: text, SingleTitle: singleTitle, SingleURL: singleURL, BtnOrientation: btnOrientation, HideAvatar: hideAvatar},
@@ -95,20 +100,20 @@ type DingResponse struct {
 	Errmsg  string `json:"message"`
 }
 
-func (r Robot) send(msg interface{}) (*DingResponse, error) {
+func (r Robot) send(msg interface{}) (DingResponse, error) {
 	var dr DingResponse
 	_, err := gou.RestPost(r.Webhook, msg, &dr)
 	if err != nil {
-		return &dr, err
+		return dr, err
 	}
 
 	logrus.Infof("send:%+v", dr)
 
 	if dr.Errcode != 0 {
-		return &dr, fmt.Errorf("dingrobot send failed: %v", dr.Errmsg)
+		return dr, fmt.Errorf("dingrobot send failed: %v", dr.Errmsg)
 	}
 
-	return &dr, nil
+	return dr, nil
 }
 
 const (

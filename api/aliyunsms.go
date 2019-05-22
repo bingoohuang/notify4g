@@ -43,17 +43,10 @@ type AliyunSmsReq struct {
 type AliyunSmsRsp struct {
 	OutId string `json:"outId"`
 
-	Code      string `json:"code"`
-	Message   string `json:"message"`
-	RequestId string `json:"requestID"`
-	BizId     string `json:"bizID"`
-}
-
-type RawAliyunSmsRsp struct {
-	Code      string // eg. OK 请求状态码。 返回OK代表请求成功。 其他错误码详见错误码列表。
-	Message   string // eg. OK 状态码的描述。
-	RequestId string // eg. F655A8D5-B967-440B-8683-DAD6FF8DE990	 请求ID。
-	BizId     string // eg. 900619746936498440^0,  发送回执ID，可根据该ID在接口QuerySendDetails中查询具体的发送状态。
+	Code      string `json:"code"`      // eg. OK 请求状态码。 返回OK代表请求成功。 其他错误码详见错误码列表。
+	Message   string `json:"message"`   // eg. OK 状态码的描述。
+	RequestId string `json:"requestID"` // eg. F655A8D5-B967-440B-8683-DAD6FF8DE990	 请求ID。
+	BizId     string `json:"bizID"`     // eg. 900619746936498440^0,  发送回执ID，可根据该ID在接口QuerySendDetails中查询具体的发送状态。
 }
 
 func (s AliyunSms) NewRequest() interface{} {
@@ -61,36 +54,28 @@ func (s AliyunSms) NewRequest() interface{} {
 }
 
 // Notify 发送短信
-func (s AliyunSms) Notify(request interface{}) (interface{}, error) {
-	smsRsp, _, err := s.NotifySms(request)
-	return smsRsp, err
+func (s AliyunSms) Notify(request interface{}) NotifyRsp {
+	req := request.(*AliyunSmsReq)
+	param, outId := s.createParams(req)
+	u, _ := gou.BuildURL("http://dysmsapi.aliyuncs.com/", param)
+
+	r := AliyunSmsRsp{OutId: outId}
+	err := gou.RestGet(u, &r)
+
+	return MakeRsp(err, r.Code == "OK", s.ChannelName(), r)
 }
 
 var _ SmsNotifier = (*AliyunSms)(nil)
+
+func (s AliyunSms) ChannelName() string {
+	return "AliyunSms"
+}
 
 func (s AliyunSms) ConvertRequest(r *SmsReq) interface{} {
 	return &AliyunSmsReq{
 		TemplateParams: r.TemplateParams,
 		Mobiles:        r.Mobiles,
 	}
-}
-
-// NotifySms 发送短信
-func (s AliyunSms) NotifySms(request interface{}) (interface{}, bool, error) {
-	req := request.(*AliyunSmsReq)
-	param, outId := s.createParams(req)
-	u, _ := gou.BuildURL("http://dysmsapi.aliyuncs.com/", param)
-
-	var r RawAliyunSmsRsp
-	err := gou.RestGet(u, &r)
-	if err != nil {
-		logrus.Warnf("RestGet fail on url %s, error %v", u, err)
-		return nil, false, err
-	}
-
-	smsRsp := &AliyunSmsRsp{OutId: outId, Code: r.Code, Message: r.Message, RequestId: r.RequestId, BizId: r.BizId}
-	return smsRsp, smsRsp.Code == "OK", err
-
 }
 
 // api doc: https://help.aliyun.com/document_detail/101414.html?spm=a2c4g.11186623.6.616.1eee202a1PxPlf

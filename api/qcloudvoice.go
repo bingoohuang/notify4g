@@ -61,11 +61,15 @@ func (q QcloudVoice) NewRequest() interface{} {
 	return &QcloudVoiceReq{}
 }
 
+func (q QcloudVoice) ChannelName() string {
+	return "QcloudVoice"
+}
+
 // 语音短信模板ID：326476   应用:{1} 监控埋点:{2} 在近{3}分钟内发生{4}, 其中最高{5}, 最低{6}
 // 示例：应用:logcenter-flume 监控埋点:events成功写入kafka的数量#mssp_server_sink#192_168_22_1 在近10分钟内发生连续7次请求次数等于0.0, 其中最高2300.0, 最低1800.0
 
 // Notify 发送信息
-func (q QcloudVoice) Notify(request interface{}) (interface{}, error) {
+func (q QcloudVoice) Notify(request interface{}) NotifyRsp {
 	r := request.(*QcloudVoiceReq)
 
 	rando := gou.RandomIntAsString()
@@ -88,9 +92,6 @@ func (q QcloudVoice) Notify(request interface{}) (interface{}, error) {
 
 	var rsp RawQcloudVoiceRsp
 	_, err := gou.RestPost(url, req, &rsp)
-	if err != nil {
-		return nil, err
-	}
 
-	return &rsp, nil
+	return MakeRsp(err, rsp.Result == 0, q.ChannelName(), rsp)
 }

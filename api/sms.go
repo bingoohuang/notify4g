@@ -1,5 +1,6 @@
 package api
 
+import "C"
 import (
 	"fmt"
 	"github.com/bingoohuang/gou"
@@ -34,48 +35,61 @@ func (r Sms) NewRequest() interface{} {
 	return &SmsReq{}
 }
 
-type SmsNotifier interface {
-	ConvertRequest(*SmsReq) interface{}
-	NotifySms(request interface{}) (interface{}, bool, error)
+func (r Sms) ChannelName() string {
+	return "Sms"
 }
 
+type SmsNotifier interface {
+	ConvertRequest(*SmsReq) interface{}
+}
+
+const BreakIterating = true
+const ContinueIterating = false
+
 // Notify 发送短信
-func (r Sms) Notify(request interface{}) (interface{}, error) {
+func (r Sms) Notify(request interface{}) NotifyRsp {
 	req := request.(*SmsReq)
 
 	retry := 0
 	maxRetry := r.maxRetryTimes(req)
 
-	var rsp interface{}
+	var rsp NotifyRsp
 	var err error
+	var succ bool
+	var channelName string
 
 	f := func(configID string) bool {
 		nc := ConfigCache.Read(configID)
 		if nc == nil {
 			err = fmt.Errorf("configID %s not found", configID)
-			return true // stop loop
+			return BreakIterating
 		}
 
-		var yes bool
-		if smsNotifier, ok := nc.Config.(SmsNotifier); !ok {
+		var smsNotifier SmsNotifier
+		var ok bool
+		if smsNotifier, ok = nc.Config.(SmsNotifier); !ok {
 			err = fmt.Errorf("configID %s not a SmsNotifier config", configID)
-			return true // stop loop
-		} else if rsp, yes, err = smsNotifier.NotifySms(smsNotifier.ConvertRequest(req)); yes {
-			return true // stop loop
+			return BreakIterating
+		}
+
+		channelName = nc.Config.ChannelName()
+		r := smsNotifier.ConvertRequest(req)
+		rsp = nc.Config.Notify(r)
+		if rsp.Status == 200 {
+			succ = true
+			return BreakIterating
 		}
 
 		if retry < maxRetry {
 			retry++
-			return false // continue loop
+			return ContinueIterating
 		} else {
-			return true // stop loop
+			return BreakIterating
 		}
 	}
 
-	start := r.startIndex()
-	gou.IterateSlice(r.ConfigIds, start, f)
-
-	return rsp, err
+	gou.IterateSlice(r.ConfigIds, r.startIndex(), f)
+	return MakeRsp(err, succ, channelName, rsp)
 }
 
 func (r Sms) maxRetryTimes(req *SmsReq) int {

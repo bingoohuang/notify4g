@@ -22,8 +22,6 @@ type HomeData struct {
 
 func HandleHome(homeTemplate string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		homeTpl := template.Must(template.New("homeTpl").Parse(homeTemplate))
-
 		ids := gou.MakeMultiMap()
 		ConfigCache.Walk(func(k string, v *NotifyConfig) {
 			ids.Put(v.Type, k)
@@ -39,17 +37,16 @@ func HandleHome(homeTemplate string) func(w http.ResponseWriter, r *http.Request
 			{Name: "聚合短信", Path: "/raw/sms", ConfigIDs: findConfigIDs(ids, "sms")},
 		}
 
+		homeTpl := template.Must(template.New("homeTpl").Parse(homeTemplate))
 		if err := homeTpl.Execute(w, HomeData{Items: items}); err != nil {
 			http.Error(w, err.Error(), 400)
-			return
 		}
 	}
 }
 
 func findConfigIDs(m *gou.MultiMap, configType string) []string {
 	arr := make([]string, 0)
-	v, ok := m.Get(configType)
-	if ok {
+	if v, ok := m.Get(configType); ok {
 		for _, i := range v {
 			arr = append(arr, i.(string))
 		}
@@ -60,7 +57,7 @@ func findConfigIDs(m *gou.MultiMap, configType string) []string {
 }
 
 type Tester interface {
-	Send() (interface{}, error)
+	Send() NotifyRsp
 }
 
 type AliyunsmsTester struct {
@@ -98,13 +95,13 @@ type SmsTester struct {
 	Data   SmsReq `json:"data"`
 }
 
-func (r AliyunsmsTester) Send() (interface{}, error)      { return r.Config.Notify(&r.Data) }
-func (r DingtalkReqTester) Send() (interface{}, error)    { return r.Config.Notify(&r.Data) }
-func (r QcloudSmsReqTester) Send() (interface{}, error)   { return r.Config.Notify(&r.Data) }
-func (r QcloudSmsVoiceTester) Send() (interface{}, error) { return r.Config.Notify(&r.Data) }
-func (r QywxTester) Send() (interface{}, error)           { return r.Config.Notify(&r.Data) }
-func (r MailTester) Send() (interface{}, error)           { return r.Config.Notify(&r.Data) }
-func (r SmsTester) Send() (interface{}, error)            { return r.Config.Notify(&r.Data) }
+func (r AliyunsmsTester) Send() NotifyRsp      { return r.Config.Notify(&r.Data) }
+func (r DingtalkReqTester) Send() NotifyRsp    { return r.Config.Notify(&r.Data) }
+func (r QcloudSmsReqTester) Send() NotifyRsp   { return r.Config.Notify(&r.Data) }
+func (r QcloudSmsVoiceTester) Send() NotifyRsp { return r.Config.Notify(&r.Data) }
+func (r QywxTester) Send() NotifyRsp           { return r.Config.Notify(&r.Data) }
+func (r MailTester) Send() NotifyRsp           { return r.Config.Notify(&r.Data) }
+func (r SmsTester) Send() NotifyRsp            { return r.Config.Notify(&r.Data) }
 
 func HandleRaw(path string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -119,7 +116,7 @@ func handleRawInternal(path string, w http.ResponseWriter, r *http.Request) erro
 	}
 
 	configType := subs[0]
-	tester := createTester(configType)
+	tester := newTester(configType)
 	if tester == nil {
 		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: "invalid type " + configType})
 	}
@@ -133,33 +130,20 @@ func handleRawInternal(path string, w http.ResponseWriter, r *http.Request) erro
 			return WriteErrorJSON(400, w, Rsp{Status: 400, Message: err.Error()})
 		}
 
-		if rsp, err := tester.Send(); err != nil {
-			return WriteErrorJSON(400, w, Rsp{Status: 400, Message: err.Error()})
-		} else {
-			return WriteJSON(w, rsp)
-		}
+		rsp := tester.Send()
+		return WriteJSON(w, rsp)
 	default:
 		return WriteErrorJSON(404, w, Rsp{Status: 404, Message: "Not Found"})
 	}
 }
 
-func createTester(configType string) Tester {
-	switch configType {
-	case "aliyunsms":
-		return &AliyunsmsTester{}
-	case "dingtalkrobot":
-		return &DingtalkReqTester{}
-	case "qcloudsms":
-		return &QcloudSmsReqTester{}
-	case "qcloudvoice":
-		return &QcloudSmsVoiceTester{}
-	case "qywx":
-		return &QywxTester{}
-	case "mail":
-		return &MailTester{}
-	case "sms":
-		return &SmsTester{}
-	default:
-		return nil
+func newTester(configType string) Tester {
+	v := gou.Decode(configType, "aliyunsms", &AliyunsmsTester{}, "dingtalkrobot", &DingtalkReqTester{},
+		"qcloudsms", &QcloudSmsReqTester{}, "qcloudvoice", &QcloudSmsVoiceTester{}, "qywx", &QywxTester{},
+		"mail", &MailTester{}, "sms", &SmsTester{})
+	if v != nil {
+		return v.(Tester)
 	}
+
+	return nil
 }

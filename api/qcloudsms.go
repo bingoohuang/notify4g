@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/bingoohuang/gou"
+	"github.com/thoas/go-funk"
 	"strings"
 
 	"strconv"
@@ -65,7 +66,7 @@ type RawQcloudSmsRspDetail struct {
 	Errmsg     string `json:"errmsg"`
 }
 
-type RawQcloudSmsRsp struct {
+type QcloudSmsRsp struct {
 	Result int                     `json:"result"`
 	Errmsg string                  `json:"errmsg"`
 	Ext    string                  `json:"ext"`
@@ -87,12 +88,36 @@ func (q QcloudSms) NewRequest() interface{} {
 // 模板 157749 参数列表 ["appName", "key","minutes","counts","max","min"]
 
 // Notify 发送信息
-func (q QcloudSms) Notify(request interface{}) (interface{}, error) {
-	rsp, _, err := q.NotifySms(request)
-	return rsp, err
+func (q QcloudSms) Notify(request interface{}) NotifyRsp {
+	r := request.(*QcloudSmsReq)
+
+	rando := gou.RandomIntAsString()
+	// 指定模板群发短信 https://cloud.tencent.com/document/product/382/5977
+	url, _ := gou.BuildURL("https://yun.tim.qq.com/v5/tlssmssvr/sendmultisms2",
+		map[string]string{"sdkappid": q.Sdkappid, "random": rando})
+	logrus.Infof("url:%s", url)
+
+	t := time.Now().Unix()
+	req := &RawQcloudSmsReq{
+		Params: r.Params,
+		Sig:    q.CreateSignature(rando, t, r.Mobiles...),
+		// Sign:   "北京数字认证",
+		Tel:   funk.Map(r.Mobiles, func(tel string) Tel { return Tel{Mobile: tel, NationCode: "86"} }).([]Tel),
+		Time:  t,
+		TplID: q.TplID,
+	}
+
+	var rsp QcloudSmsRsp
+	_, err := gou.RestPost(url, req, &rsp)
+
+	return MakeRsp(err, rsp.Result == 0, q.ChannelName(), rsp)
 }
 
 var _ SmsNotifier = (*QcloudSms)(nil)
+
+func (q QcloudSms) ChannelName() string {
+	return "QcloudSms"
+}
 
 func (q QcloudSms) ConvertRequest(r *SmsReq) interface{} {
 	params := make([]string, len(q.TmplVarNames))
@@ -106,39 +131,4 @@ func (q QcloudSms) ConvertRequest(r *SmsReq) interface{} {
 		Params:  params,
 		Mobiles: r.Mobiles,
 	}
-}
-
-// NotifySms 发送短信
-func (q QcloudSms) NotifySms(request interface{}) (interface{}, bool, error) {
-	r := request.(*QcloudSmsReq)
-
-	rando := gou.RandomIntAsString()
-	// 指定模板群发短信 https://cloud.tencent.com/document/product/382/5977
-	url, _ := gou.BuildURL("https://yun.tim.qq.com/v5/tlssmssvr/sendmultisms2",
-		map[string]string{"sdkappid": q.Sdkappid, "random": rando})
-	logrus.Infof("url:%s", url)
-
-	tels := make([]Tel, len(r.Mobiles))
-	for i, tel := range r.Mobiles {
-		tels[i] = Tel{Mobile: tel, NationCode: "86"}
-	}
-
-	t := time.Now().Unix()
-	req := &RawQcloudSmsReq{
-		Params: r.Params,
-		Sig:    q.CreateSignature(rando, t, r.Mobiles...),
-		// Sign:   "北京数字认证",
-		Tel:   tels,
-		Time:  t,
-		TplID: q.TplID,
-	}
-
-	var rawRsp RawQcloudSmsRsp
-	_, err := gou.RestPost(url, req, &rawRsp)
-	if err != nil {
-		logrus.Debugf("post error %v", err)
-		return nil, false, err
-	}
-
-	return &rawRsp, rawRsp.Result == 0, nil
 }
