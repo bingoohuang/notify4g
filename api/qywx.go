@@ -94,13 +94,8 @@ type QywxRsp struct {
 	Invalidtag   string `json:"invalidtag"`
 }
 
-func (s Qywx) NewRequest() interface{} {
-	return &QywxReq{}
-}
-
-func (s Qywx) ChannelName() string {
-	return "Qywx"
-}
+func (s Qywx) NewRequest() interface{} { return &QywxReq{} }
+func (s Qywx) ChannelName() string     { return qywx }
 
 // Notify 发送企业消息
 func (s Qywx) Notify(request interface{}) NotifyRsp {

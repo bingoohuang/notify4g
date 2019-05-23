@@ -78,9 +78,8 @@ type QcloudSmsReq struct {
 	Mobiles []string `json:"mobiles" faker:"china_mobile_number"`
 }
 
-func (q QcloudSms) NewRequest() interface{} {
-	return &QcloudSmsReq{}
-}
+func (q QcloudSms) ChannelName() string     { return qcloudsms }
+func (q QcloudSms) NewRequest() interface{} { return &QcloudSmsReq{} }
 
 // 目前业务埋点监控告警模板如下:
 // 短信模板ID：157749   应用:{1} 监控埋点:{2} 在近{3}分钟内发生{4}, 其中最高{5}, 最低{6}
@@ -114,10 +113,6 @@ func (q QcloudSms) Notify(request interface{}) NotifyRsp {
 }
 
 var _ SmsNotifier = (*QcloudSms)(nil)
-
-func (q QcloudSms) ChannelName() string {
-	return "QcloudSms"
-}
 
 func (q QcloudSms) ConvertRequest(r *SmsReq) interface{} {
 	params := make([]string, len(q.TmplVarNames))

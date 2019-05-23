@@ -40,13 +40,8 @@ type MailReq struct {
 	To      []string `json:"to" faker:"email"`
 }
 
-func (q Mail) NewRequest() interface{} {
-	return &MailReq{}
-}
-
-func (q Mail) ChannelName() string {
-	return "Mail"
-}
+func (q Mail) NewRequest() interface{} { return &MailReq{} }
+func (q Mail) ChannelName() string     { return mail }
 
 // Notify 发送邮件
 func (q Mail) Notify(request interface{}) NotifyRsp {
@@ -56,7 +51,8 @@ func (q Mail) Notify(request interface{}) NotifyRsp {
 	mm.SetHeader("From", q.From)
 	mm.SetHeader("To", r.To...)
 	mm.SetHeader("Subject", r.Subject)
-	mm.SetBody("text/plain", r.Message)
+	//mm.SetBody("text/plain", r.Message)
+	mm.SetBody("text/html", r.Message)
 
 	d := gomail.NewDialer(q.SmtpAddr, q.SmtpPort, q.Username, q.Pass)
 

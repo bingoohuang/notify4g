@@ -32,6 +32,16 @@ type HomeData struct {
 	Items     []NotifierItem
 }
 
+const (
+	aliyunsms     = "aliyunsms"
+	dingtalkrobot = "dingtalkrobot"
+	qcloudsms     = "qcloudsms"
+	qcloudvoice   = "qcloudvoice"
+	qywx          = "qywx"
+	mail          = "mail"
+	sms           = "sms"
+)
+
 func HandleHome(homeTemplate string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ids := gou.MakeMultiMap()
@@ -40,13 +50,13 @@ func HandleHome(homeTemplate string) func(w http.ResponseWriter, r *http.Request
 		})
 
 		items := []NotifierItem{
-			{Name: "阿里云短信", Path: "/raw/aliyunsms", ConfigIDs: findConfigIDs(ids, "aliyunsms")},
-			{Name: "钉钉机器人", Path: "/raw/dingtalkrobot", ConfigIDs: findConfigIDs(ids, "dingtalkrobot")},
-			{Name: "腾讯云短信", Path: "/raw/qcloudsms", ConfigIDs: findConfigIDs(ids, "qcloudsms")},
-			{Name: "腾讯云语音", Path: "/raw/qcloudvoice", ConfigIDs: findConfigIDs(ids, "qcloudvoice")},
-			{Name: "企业微信", Path: "/raw/qywx", ConfigIDs: findConfigIDs(ids, "qywx")},
-			{Name: "SMTP邮件", Path: "/raw/mail", ConfigIDs: findConfigIDs(ids, "mail")},
-			{Name: "聚合短信", Path: "/raw/sms", ConfigIDs: findConfigIDs(ids, "sms")},
+			{Name: "阿里云短信", Path: "/" + aliyunsms, ConfigIDs: findConfigIDs(ids, aliyunsms)},
+			{Name: "钉钉机器人", Path: "/" + dingtalkrobot, ConfigIDs: findConfigIDs(ids, dingtalkrobot)},
+			{Name: "腾讯云短信", Path: "/" + qcloudsms, ConfigIDs: findConfigIDs(ids, qcloudsms)},
+			{Name: "腾讯云语音", Path: "/" + qcloudvoice, ConfigIDs: findConfigIDs(ids, qcloudvoice)},
+			{Name: "企业微信", Path: "/" + qywx, ConfigIDs: findConfigIDs(ids, qywx)},
+			{Name: "SMTP邮件", Path: "/" + mail, ConfigIDs: findConfigIDs(ids, mail)},
+			{Name: "聚合短信", Path: "/" + sms, ConfigIDs: findConfigIDs(ids, sms)},
 		}
 
 		homeTpl := template.Must(template.New("homeTpl").Parse(homeTemplate))
@@ -150,9 +160,9 @@ func handleRawInternal(path string, w http.ResponseWriter, r *http.Request) erro
 }
 
 func newTester(configType string) Tester {
-	v := gou.Decode(configType, "aliyunsms", &AliyunsmsTester{}, "dingtalkrobot", &DingtalkReqTester{},
-		"qcloudsms", &QcloudSmsReqTester{}, "qcloudvoice", &QcloudSmsVoiceTester{}, "qywx", &QywxTester{},
-		"mail", &MailTester{}, "sms", &SmsTester{})
+	v := gou.Decode(configType, aliyunsms, &AliyunsmsTester{}, dingtalkrobot, &DingtalkReqTester{},
+		qcloudsms, &QcloudSmsReqTester{}, qcloudvoice, &QcloudSmsVoiceTester{}, qywx, &QywxTester{},
+		mail, &MailTester{}, sms, &SmsTester{})
 	if v != nil {
 		return v.(Tester)
 	}

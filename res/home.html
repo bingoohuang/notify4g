@@ -123,7 +123,7 @@
 
         let lastRow = null;
 
-        let url = "";
+        let routerPath = "";
         let configID = null;
         let MODE = 0;
 
@@ -146,18 +146,18 @@
             lastRow = td.parents('tr');
             lastRow.addClass('success');
 
-            url = td.parents('tr').find('.path').text();
+            routerPath = td.parents('tr').find('.path').text();
         };
 
         $('.testLink').click(function (event) {
             event.preventDefault();
             highlightCurrentRow($(this));
-            configID = null
+            configID = null;
             MODE = 1;
 
             $.ajax({
                 type: 'GET',
-                url: url,
+                url: routerPath,
                 success: function (content) {
                     reqEditor.setValue(JSON.stringify(content, null, 4));
                     rspEditor.setValue('{}');
@@ -176,7 +176,7 @@
 
             let editUrl = "";
             if ($(this).hasClass("New")) {
-                editUrl = /config/ + configID + "/" + url.split(/\//).pop();
+                editUrl = /config/ + configID + routerPath;
                 $('#configIDInput').val("")
             } else {
                 editUrl = /config/ + configID;
@@ -224,7 +224,7 @@
             if (MODE === 1) {
                 $.ajax({
                     type: 'POST',
-                    url: url,
+                    url: routerPath,
                     processData: false,
                     data: reqEditor.getValue(),
                     success: function (content) {

@@ -49,9 +49,8 @@ type AliyunSmsRsp struct {
 	BizId     string `json:"bizID"`     // eg. 900619746936498440^0,  发送回执ID，可根据该ID在接口QuerySendDetails中查询具体的发送状态。
 }
 
-func (s AliyunSms) NewRequest() interface{} {
-	return &AliyunSmsReq{}
-}
+func (s AliyunSms) NewRequest() interface{} { return &AliyunSmsReq{} }
+func (s AliyunSms) ChannelName() string     { return aliyunsms }
 
 // Notify 发送短信
 func (s AliyunSms) Notify(request interface{}) NotifyRsp {
@@ -67,15 +66,8 @@ func (s AliyunSms) Notify(request interface{}) NotifyRsp {
 
 var _ SmsNotifier = (*AliyunSms)(nil)
 
-func (s AliyunSms) ChannelName() string {
-	return "AliyunSms"
-}
-
 func (s AliyunSms) ConvertRequest(r *SmsReq) interface{} {
-	return &AliyunSmsReq{
-		TemplateParams: r.TemplateParams,
-		Mobiles:        r.Mobiles,
-	}
+	return &AliyunSmsReq{TemplateParams: r.TemplateParams, Mobiles: r.Mobiles}
 }
 
 // api doc: https://help.aliyun.com/document_detail/101414.html?spm=a2c4g.11186623.6.616.1eee202a1PxPlf

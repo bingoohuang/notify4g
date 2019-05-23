@@ -30,13 +30,8 @@ type SmsReq struct {
 	Retry          int               `json:"retry" faker:"-"` // 在发送配置中，重试n次, -1表示使用默认配置
 }
 
-func (r Sms) NewRequest() interface{} {
-	return &SmsReq{}
-}
-
-func (r Sms) ChannelName() string {
-	return "Sms"
-}
+func (r Sms) NewRequest() interface{} { return &SmsReq{} }
+func (r Sms) ChannelName() string     { return sms }
 
 type SmsNotifier interface {
 	ConvertRequest(*SmsReq) interface{}

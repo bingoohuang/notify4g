@@ -60,13 +60,8 @@ type RawQcloudVoiceReq struct {
 	Ext       string   `json:"ext"`  // 用户的 session 内容，腾讯 server 回包中会原样返回，可选字段，不需要就填空
 }
 
-func (q QcloudVoice) NewRequest() interface{} {
-	return &QcloudVoiceReq{}
-}
-
-func (q QcloudVoice) ChannelName() string {
-	return "QcloudVoice"
-}
+func (q QcloudVoice) NewRequest() interface{} { return &QcloudVoiceReq{} }
+func (q QcloudVoice) ChannelName() string     { return qcloudvoice }
 
 // 语音短信模板ID：326476   应用:{1} 监控埋点:{2} 在近{3}分钟内发生{4}, 其中最高{5}, 最低{6}
 // 示例：应用:logcenter-flume 监控埋点:events成功写入kafka的数量#mssp_server_sink#192_168_22_1 在近10分钟内发生连续7次请求次数等于0.0, 其中最高2300.0, 最低1800.0

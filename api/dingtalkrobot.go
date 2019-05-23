@@ -23,18 +23,13 @@ func (s *Dingtalk) InitMeaning() {
 	s.AccessToken = "自定义机器人的accessToken"
 }
 
-func (s Dingtalk) ChannelName() string {
-	return "Dingtalk"
-}
+func (s Dingtalk) ChannelName() string     { return dingtalkrobot }
+func (s Dingtalk) NewRequest() interface{} { return &DingtalkReq{} }
 
 type DingtalkReq struct {
 	Message   string   `json:"message"`
 	AtMobiles []string `json:"atMobiles" faker:"china_mobile_number"`
 	AtAll     bool     `json:"atAll"`
-}
-
-func (s Dingtalk) NewRequest() interface{} {
-	return &DingtalkReq{}
 }
 
 // Notify 发送信息
