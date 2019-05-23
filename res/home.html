@@ -7,48 +7,14 @@
     <script type="text/javascript" src="/static/jquery/2.1.3/jquery.min.js"></script>
     <script type="text/javascript" src="/static/codemirror/5.45.0/codemirror.min.js"></script>
     <script type="text/javascript" src="/static/codemirror/5.45.0/javascript.min.js"></script>
+    <link href="/static/codemirror.bootstrap.css" rel="stylesheet">
+    <script type="text/javascript" src="/static/home.js"></script>
 
     <style>
         .margin-10 {
             margin-top: 1.0em;
             margin-bottom: 1.0em;
         }
-
-        .CodeMirror {
-            height: auto;
-
-            /* Bootstrap Settings */
-            box-sizing: border-box;
-            margin: 0;
-            font: inherit;
-            overflow: auto;
-            font-family: inherit;
-            display: block;
-            width: 100%;
-            padding: 6px 12px;
-            font-size: 14px;
-            line-height: 1.42857143;
-            color: #555;
-            background-color: #fff;
-            background-image: none;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-            transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-            /* Code Mirror Settings */
-            font-family: monospace;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .CodeMirror-focused {
-            /* Bootstrap Settings */
-            border-color: #66afe9;
-            outline: 0;
-            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
-            transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-        }
-
     </style>
 </head>
 <body>
@@ -93,11 +59,10 @@
     </div>
 
     <div class="row">
-        <textarea id="reqEditor"></textarea>
+        <label for="reqEditor">Request:</label><textarea id="reqEditor"></textarea>
         <div class="text-center margin-10">
             <span id="configDiv" style="display: none">
                 ConfigID：<input id="configIDInput" placeholder="Config ID" type="text">
-                &nbsp;
             </span>
             <button type="button" id="btnSend" class="btn btn-default">Test Notify</button>
             <button type="button" id="btnDelete" class="btn btn-default" style="display: none;">Drop Config</button>
@@ -105,178 +70,8 @@
     </div>
 
     <div class="row">
-        <textarea id="rspEditor"></textarea>
+        <label for="rspEditor">Response:</label><textarea id="rspEditor"></textarea>
     </div>
 </div>
 </body>
-
-<script>
-    $(function () {
-        const reqEditor = CodeMirror.fromTextArea(document.getElementById("reqEditor"), {
-            mode: 'application/json', lineNumbers: true
-        });
-        const rspEditor = CodeMirror.fromTextArea(document.getElementById("rspEditor"), {
-            mode: 'application/json', lineNumbers: true
-        });
-        reqEditor.setValue('{}');
-        rspEditor.setValue('{}');
-
-        let lastRow = null;
-
-        let routerPath = "";
-        let configID = null;
-        let MODE = 0;
-
-
-        const toggleDiv = function () {
-            $('#configDiv').toggle(MODE === 2 || MODE === 3);
-            if (MODE === 2) {
-                $('#btnSend').text("Save Config")
-            } else {
-                $('#btnSend').text("Test Notify")
-            }
-
-            $('#btnDelete').toggle(MODE === 2)
-        };
-
-        const highlightCurrentRow = function (td) {
-            if (lastRow) {
-                lastRow.removeClass('success')
-            }
-            lastRow = td.parents('tr');
-            lastRow.addClass('success');
-
-            routerPath = td.parents('tr').find('.path').text();
-        };
-
-        $('.testLink').click(function (event) {
-            event.preventDefault();
-            highlightCurrentRow($(this));
-            configID = null;
-            MODE = 1;
-
-            $.ajax({
-                type: 'GET',
-                url: routerPath,
-                success: function (content) {
-                    reqEditor.setValue(JSON.stringify(content, null, 4));
-                    rspEditor.setValue('{}');
-                    toggleDiv()
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseText + "\nStatus: " + textStatus + "\nError: " + errorThrown)
-                }
-            })
-        });
-
-        $('.editConfig').click(function (event) {
-            event.preventDefault();
-            highlightCurrentRow($(this));
-            configID = $(this).text();
-
-            let editUrl = "";
-            if ($(this).hasClass("New")) {
-                editUrl = /config/ + configID + routerPath;
-                $('#configIDInput').val("")
-            } else {
-                editUrl = /config/ + configID;
-                $('#configIDInput').val(configID)
-            }
-
-            MODE = 2;
-
-            $.ajax({
-                type: 'GET',
-                url: editUrl,
-                success: function (content) {
-                    reqEditor.setValue(JSON.stringify(content, null, 4));
-                    rspEditor.setValue('{}');
-                    toggleDiv()
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseText + "\nStatus: " + textStatus + "\nError: " + errorThrown)
-                }
-            })
-        });
-
-        $('.configNotify').click(function (event) {
-            event.preventDefault();
-            highlightCurrentRow($(this));
-            configID = $(this).text();
-            $('#configIDInput').val(configID);
-            MODE = 3;
-
-            $.ajax({
-                type: 'GET',
-                url: /notify/ + configID,
-                success: function (content) {
-                    reqEditor.setValue(JSON.stringify(content, null, 4));
-                    rspEditor.setValue('{}');
-                    toggleDiv()
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseText + "\nStatus: " + textStatus + "\nError: " + errorThrown)
-                }
-            })
-        });
-
-        $('#btnSend').click(function () {
-            if (MODE === 1) {
-                $.ajax({
-                    type: 'POST',
-                    url: routerPath,
-                    processData: false,
-                    data: reqEditor.getValue(),
-                    success: function (content) {
-                        rspEditor.setValue(JSON.stringify(content, null, 4))
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        alert(jqXHR.responseText + "\nStatus: " + textStatus + "\nError: " + errorThrown)
-                    }
-                })
-            } else if (MODE === 2) {
-                $.ajax({
-                    type: 'POST',
-                    url: /config/ + $('#configIDInput').val(),
-                    processData: false,
-                    data: reqEditor.getValue(),
-                    success: function (content) {
-                        rspEditor.setValue(JSON.stringify(content, null, 4))
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        alert(jqXHR.responseText + "\nStatus: " + textStatus + "\nError: " + errorThrown)
-                    }
-                })
-            } else if (MODE === 3) {
-                $.ajax({
-                    type: 'POST',
-                    url: /notify/ + $('#configIDInput').val(),
-                    processData: false,
-                    data: reqEditor.getValue(),
-                    success: function (content) {
-                        rspEditor.setValue(JSON.stringify(content, null, 4))
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        alert(jqXHR.responseText + "\nStatus: " + textStatus + "\nError: " + errorThrown)
-                    }
-                })
-            }
-        });
-
-        $('#btnDelete').click(function () {
-            $.ajax({
-                type: 'DELETE',
-                url: /config/ + $('#configIDInput').val(),
-                success: function (content) {
-                    rspEditor.setValue(JSON.stringify(content, null, 4))
-                    document.location.reload()
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseText + "\nStatus: " + textStatus + "\nError: " + errorThrown)
-                }
-            })
-        });
-    })
-</script>
-
 </html>
