@@ -1,17 +1,46 @@
 package main
 
 import (
-	"flag"
+	"fmt"
 	"github.com/bingoohuang/faker"
 	"github.com/bingoohuang/gou"
+	"github.com/bingoohuang/notify4g/api"
+	_ "github.com/bingoohuang/notify4g/statiq"
 	"github.com/bingoohuang/statiq/fs"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/pflag"
 	"net/http"
-	"notify4g/api"
 	"os"
-
-	_ "notify4g/statiq"
 )
+
+// refer : https://blog.kowalczyk.info/article/vEja/embedding-build-number-in-go-executable.html
+var (
+	sha1ver   string // sha1 revision used to build the program
+	buildTime string // when the executable was built
+)
+
+var addr *string
+var snapshotDir *string
+
+func init() {
+	help := pflag.BoolP("help", "h", false, "help")
+	v := pflag.BoolP("version", "v", false, "show version and exit")
+	addr = pflag.StringP("addr", "a", ":11472", "http address to listen and serve")
+	snapshotDir = pflag.StringP("snapshotDir", "s", "./etc/snapshots", "snapshots for config")
+
+	pflag.Parse()
+
+	if *v {
+		fmt.Printf("Build on %s from sha1 %s\n", buildTime, sha1ver)
+		os.Exit(0)
+	}
+	if *help {
+		pflag.PrintDefaults()
+		os.Exit(0)
+	}
+
+	api.InitSha1verBuildTime(sha1ver, buildTime)
+}
 
 func main() {
 	defer gou.Recover()
@@ -25,16 +54,6 @@ func main() {
 	http.HandleFunc("/notify/", api.NotifyByConfig("/notify/"))
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(sfs)))
-
-	help := flag.Bool("h", false, "help")
-	addr := flag.String("addr", ":8080", "http address to listen and serve")
-	snapshotDir := flag.String("snapshotDir", "./etc/snapshots", "snapshots for config")
-	flag.Parse()
-
-	if *help {
-		flag.PrintDefaults()
-		os.Exit(0)
-	}
 
 	api.InitConfigCache(*snapshotDir)
 

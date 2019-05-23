@@ -6,8 +6,6 @@ github.com/araddon/dateparse v0.0.0-20190510211750-d2ba70357e92 h1:29yos9+rhKruI
 github.com/araddon/dateparse v0.0.0-20190510211750-d2ba70357e92/go.mod h1:SLqhdZcd+dF3TEVL2RMoob5bBP5R1P1qkox+HtCBgGI=
 github.com/averagesecurityguy/random v0.0.0-20180326012618-37cce341d2af h1:P1psVDaUckBRYLjODu1JLr/ECxWPWwYrbEaa5g7IqSM=
 github.com/averagesecurityguy/random v0.0.0-20180326012618-37cce341d2af/go.mod h1:xlqW8P0gOqVMB8Kp0mMuUznEi1PzjF+mhHTSC+ymalU=
-github.com/bingoohuang/faker v0.0.0-20190521064402-b511a003bb97 h1:27fAMZh9vlhes9Y7Ls/INKfkanFka4eTUwAw/07l33I=
-github.com/bingoohuang/faker v0.0.0-20190521064402-b511a003bb97/go.mod h1:grQoZp6gn2mJE18s8Ikq0YtdTI6dBOBpyktUz698IkY=
 github.com/bingoohuang/faker v0.0.0-20190521065953-fd0e11fac0c8 h1:2NbgblSOz/d97ilFy1lRj3CDS8b4VW18PZ4fqNtLvHc=
 github.com/bingoohuang/faker v0.0.0-20190521065953-fd0e11fac0c8/go.mod h1:Ou5FXGYOYO8iuFGhjumYe3rEor+mrPXk8yknJikmnvE=
 github.com/bingoohuang/gou v0.0.0-20190517063404-8f6f8cdae576 h1:3TY1nwwTUT/gX0kkiD7gtU0UdbrJY2b5RX7xI7veQDk=
@@ -71,6 +69,8 @@ github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c h1:fyKiXKO1
 github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c/go.mod h1:sUM3LWHvSMaG192sy56D9F7CNvL7jUJVXoqM1QKLnog=
 github.com/spf13/cast v1.3.0 h1:oget//CVOEoFewqQxwr0Ej5yjygnqGkvggSE/gB35Q8=
 github.com/spf13/cast v1.3.0/go.mod h1:Qx5cxh0v+4UWYiBimWS+eyWzqEqokIECu5etghLkUJE=
+github.com/spf13/pflag v1.0.3 h1:zPAT6CGy6wXeQ7NtTnaTerfKOsV6V6F8agHXFiazDkg=
+github.com/spf13/pflag v1.0.3/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnInEg4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=

@@ -10,6 +10,16 @@ import (
 	"strings"
 )
 
+var (
+	Sha1ver   string // sha1 revision used to build the program
+	BuildTime string // when the executable was built
+)
+
+func InitSha1verBuildTime(sha1ver, buildTime string) {
+	Sha1ver = sha1ver
+	BuildTime = buildTime
+}
+
 type NotifierItem struct {
 	Name      string
 	Path      string
@@ -17,7 +27,9 @@ type NotifierItem struct {
 }
 
 type HomeData struct {
-	Items []NotifierItem
+	Sha1ver   string
+	BuildTime string
+	Items     []NotifierItem
 }
 
 func HandleHome(homeTemplate string) func(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +50,7 @@ func HandleHome(homeTemplate string) func(w http.ResponseWriter, r *http.Request
 		}
 
 		homeTpl := template.Must(template.New("homeTpl").Parse(homeTemplate))
-		if err := homeTpl.Execute(w, HomeData{Items: items}); err != nil {
+		if err := homeTpl.Execute(w, HomeData{Sha1ver: Sha1ver, BuildTime: BuildTime, Items: items}); err != nil {
 			http.Error(w, err.Error(), 400)
 		}
 	}
