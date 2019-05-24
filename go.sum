@@ -8,6 +8,8 @@ github.com/averagesecurityguy/random v0.0.0-20180326012618-37cce341d2af h1:P1psV
 github.com/averagesecurityguy/random v0.0.0-20180326012618-37cce341d2af/go.mod h1:xlqW8P0gOqVMB8Kp0mMuUznEi1PzjF+mhHTSC+ymalU=
 github.com/bingoohuang/faker v0.0.0-20190521065953-fd0e11fac0c8 h1:2NbgblSOz/d97ilFy1lRj3CDS8b4VW18PZ4fqNtLvHc=
 github.com/bingoohuang/faker v0.0.0-20190521065953-fd0e11fac0c8/go.mod h1:Ou5FXGYOYO8iuFGhjumYe3rEor+mrPXk8yknJikmnvE=
+github.com/bingoohuang/faker v0.0.0-20190521151430-dcff11ac7f06 h1:2RPOOgUID63wG/VotQLnTZ1E7kyp53DjOnhfkfE8rHA=
+github.com/bingoohuang/faker v0.0.0-20190521151430-dcff11ac7f06/go.mod h1:a/SwpaoIQvCHzQ7LYuRV7xzx/NDYddcI5xfQdvBRxwg=
 github.com/bingoohuang/gou v0.0.0-20190517063404-8f6f8cdae576 h1:3TY1nwwTUT/gX0kkiD7gtU0UdbrJY2b5RX7xI7veQDk=
 github.com/bingoohuang/gou v0.0.0-20190517063404-8f6f8cdae576/go.mod h1:xnbjSDSqE2ZNZ0w67WJ6VBayCYRinZnozXgS4Uoqyzo=
 github.com/bingoohuang/statiq v0.2.1 h1:L7Uya0pM+wbw4CYkF9DVMJ0h0aSUx4mb0X7udk/M7NA=

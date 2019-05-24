@@ -20,7 +20,7 @@ API document style refers to [White House Web API Standards](https://github.com/
 ### API Resources
 
 * [GET /raw/:channel](#get-rawchannel)
-* POST /raw/:channel
+* [POST /raw/:channel](#post-rawchannel)
 * GET /config/:configID
 * GET /config/:configID/:channel
 * POST /config/:configID
@@ -212,6 +212,356 @@ Response body:
     }
 }
 ```
+
+</p>
+</details>
+
+### POST /raw/:channel
+
+<details><summary>POST /raw/aliyunsms</summary>
+<p>
+Request body:
+
+```json
+{
+    "config": {
+        "accessKeyID": "pGkWHwdlIFPxNbwOuzqqHudVk",
+        "acessKeySecret": "MuIuTxqaaqPFOqNtVZGGxyIVJ",
+        "templateCode": "SMS_11111",
+        "signName": "xx编程网"
+    },
+    "data": {
+        "templateCode": "",
+        "templateParams": {
+            "code": "123456"
+        },
+        "signName": "",
+        "mobiles": [
+            "11350758197",
+            "12414111245"
+        ]
+    }
+}
+```
+
+Response body:
+
+```json
+{
+  "status": 200,
+  "message": "OK",
+  "data": {
+    "channel": "aliyunsms",
+    "raw": {
+      "outId": "yOpBUzo90hnezrhs",
+      "code": "OK",
+      "message": "OK",
+      "requestID": "E4F3D966-002D-4D5D-BFA5-10E547334434",
+      "bizID": "831713858682882984^0"
+    }
+  }
+}
+```
+
+</p>
+</details>
+<details><summary>POST /raw/dingtalkrobot</summary>
+<p>
+Request body:
+
+```json
+{
+    "config": {
+        "accessToken": "RICScixPcBbEJRMdcvNPTqkUr"
+    },
+    "data": {
+        "message": "WYouyJaLExAVGGWpTVumZgXhZ",
+        "atMobiles": [
+            "10707297593",
+            "18621963646"
+        ],
+        "atAll": false
+    }
+}
+```
+
+Response body:
+
+```json
+{
+    "status": 200,
+    "message": "OK",
+    "data": {
+        "channel": "dingtalkrobot",
+        "raw": {
+            "code": 0,
+            "message": ""
+        }
+    }
+}
+```
+
+</p>
+</details>
+<details><summary>POST /raw/qcloudsms</summary>
+<p>
+Request body:
+
+```json
+{
+    "config": {
+        "sdkappid": "erKoSpOlNAKZgTBwZWsyKuSHt",
+        "appkey": "aQtuUztXdxpTFcPsdnowkiBUK",
+        "tplID": 34,
+        "sign": "",
+        "tmplVarNames": [
+            "oIpzKCYbQmBEaiWXeCPOYwFEG"
+        ]
+    },
+    "data": {
+        "params": [
+            "QxIiueXozjhTVNMhdANVnYMvR"
+        ],
+        "mobiles": [
+            "14432444366"
+        ]
+    }
+}
+```
+
+Response body:
+
+```json
+{
+    "status": 200,
+    "message": "OK",
+    "data": {
+        "channel": "qcloudsms",
+        "raw": {
+            "result": 0,
+            "errmsg": "OK",
+            "ext": "",
+            "detail": [
+                {
+                    "fee": 1,
+                    "mobile": "18551855099",
+                    "nationcode": "86",
+                    "sid": "2019:6646899365302911964",
+                    "result": 0,
+                    "errmsg": "OK"
+                }
+            ]
+        }
+    }
+}
+```
+
+</p>
+</details>
+<details><summary>POST /raw/qcloudvoice</summary>
+<p>
+Request body:
+
+```json
+{
+    "config": {
+        "sdkappid": "nCQtPPaOBnGymUUMmcjWRvxra",
+        "appkey": "jdWinpYVkCusHaznjRBxSghoq",
+        "tplID": 15,
+        "playTimes": 1,
+        "tmplVarNames": ["AppName", "WarnSrc", "WithMinutes", "Warning", "Min", "Max"]
+    },
+    "data": {
+        "params": {
+            "AppName": "demo", "WarnSrc": "host1", "WithMinutes": "5分", "Warning": "可用内存不足", "Min": "100M", "Max": "200M"
+        },
+        "mobile": "13388093706"
+    }
+}
+```
+
+Response body:
+
+```json
+{
+    "status": 200,
+    "message": "OK",
+    "data": {
+        "channel": "qcloudvoice",
+        "raw": {
+            "result": 0,
+            "errmsg": "OK",
+            "callid": "bef3d1ce-7df8-11e9-aa35-52540075d5e6",
+            "ext": ""
+        }
+    }
+}
+```
+
+</p>
+</details>
+<details><summary>POST /raw/qywx</summary>
+<p>
+Request body:
+
+```json
+{
+    "config": {
+        "corpID": "TavUQCHdZPmNTkeszuHITWFai",
+        "corpSecret": "YiomBBitrBsEqINJYLpSnpXIe",
+        "agentID": "1000002"
+    },
+    "data": {
+        "msg": "DPhnPBkYHnKTIltUTvqZqriNS",
+        "userIds": [
+            "huangjinbing"
+        ]
+    }
+}
+```
+
+Response body:
+
+```json
+{
+    "status": 200,
+    "message": "OK",
+    "data": {
+        "channel": "qywx",
+        "raw": {
+            "errcode": 0,
+            "errmsg": "ok",
+            "invaliduser": "",
+            "invalidparty": "",
+            "invalidtag": ""
+        }
+    }
+}
+```
+
+</p>
+</details>
+<details><summary>POST /raw/mail</summary>
+<p>
+Request body:
+
+```json
+{
+    "config": {
+        "smtpAddr": "iPtbQlchfAcisTedBhGwWsoZz",
+        "smtpPort": 2,
+        "from": "ExTWPRT@gYNcz.org",
+        "username": "xfAdFgSoGYsPsupEGKPUqnIzf",
+        "pass": "lBPKGnydFjkaGjBrEdufObPwt"
+    },
+    "data": {
+        "subject": "jagoWiJBpkulohboaWqPgZZMo",
+        "message": "PycUxHOvIUqKuHhcJouyJPsUL",
+        "to": [
+            "mCypiaF@TOuRk.net",
+            "jrrEYOi@FQMlD.ru"
+        ]
+    }
+}
+```
+
+Response body:
+
+```json
+{
+    "status": 200,
+    "message": "OK",
+    "data": {
+        "channel": "mail",
+        "raw": null
+    }
+}
+```
+
+```json
+{
+    "status": 400,
+    "message": "dial tcp: lookup TfdZkPmcNDQFtfAEdRQfgzQkZ: no such host",
+    "data": {
+        "channel": "mail",
+        "raw": null
+    }
+}
+```
+
+</p>
+</details>
+<details><summary>POST /raw/sms</summary>
+<p>
+Request body:
+
+```json
+{
+    "config": {
+        "configIds": [
+            "as100",
+            "qs200"
+        ],
+        "random": true,
+        "retry": 0
+    },,
+    "data": {
+        "templateParams": {
+            "code": "123456"
+        },
+        "mobiles": [
+            "14509804092"
+        ],
+        "retry": 0
+    }
+}
+```
+
+Response body:
+
+```json
+{
+    "status": 200,
+    "message": "OK",
+    "data": {
+        "channel": "aliyunsms",
+        "raw": {
+            "outId": "9q2hoGoxwyoBM4wx",
+            "code": "OK",
+            "message": "OK",
+            "requestID": "6A8F6D26-AE2B-475F-B603-3886454F0587",
+            "bizID": "410500758684794600^0"
+        }
+    }
+}
+```
+
+```json
+{
+    "status": 200,
+    "message": "OK",
+    "data": {
+        "channel": "qcloudsms",
+        "raw": {
+            "result": 0,
+            "errmsg": "OK",
+            "ext": "",
+            "detail": [
+                {
+                    "fee": 1,
+                    "mobile": "14509804092",
+                    "nationcode": "86",
+                    "sid": "8:fCI6QdTlfniajRq3qCK20190524",
+                    "result": 0,
+                    "errmsg": "OK"
+                }
+            ]
+        }
+    }
+}
+
+```
+
 
 </p>
 </details>

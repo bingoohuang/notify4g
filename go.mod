@@ -3,7 +3,7 @@ module github.com/bingoohuang/notify4g
 go 1.12
 
 require (
-	github.com/bingoohuang/faker v0.0.0-20190521065953-fd0e11fac0c8
+	github.com/bingoohuang/faker v0.0.0-20190521151430-dcff11ac7f06
 	github.com/bingoohuang/gou v0.0.0-20190517063404-8f6f8cdae576
 	github.com/bingoohuang/statiq v0.2.1
 	github.com/mitchellh/go-homedir v1.1.0
