@@ -15,6 +15,8 @@ notify api for sms/voice/qywx/mail/dingtalk
 
 ## Request & Response Examples
 
+API document style refers to [White House Web API Standards](https://github.com/WhiteHouse/api-standards).
+
 ### API Resources
 
 * [GET /raw/:channel](#get-rawchannel)
@@ -72,6 +74,141 @@ Response body:
             "12123690368"
         ],
         "atAll": true
+    }
+}
+```
+
+</p>
+</details>
+<details><summary>GET /raw/qcloudsms</summary>
+<p>
+Response body:
+
+```json
+{
+    "config": {
+        "sdkappid": "VIsOIVUTXKvmznGCfpklQBsHl",
+        "appkey": "jyuRWrnndYwTzEQIDtpaulCEv",
+        "tplID": 58,
+        "sign": "",
+        "tmplVarNames": [
+            "NtAOrrDyTQZprXHlRyMKIQVrJ"
+        ]
+    },
+    "data": {
+        "params": [
+            "DfQeutEzaCfShlItCeaEkTUGF",
+            "DZiVFEPPlMANVxGwaCVjypmXA"
+        ],
+        "mobiles": [
+            "15923459113",
+            "18923435937"
+        ]
+    }
+}
+```
+
+</p>
+</details>
+<details><summary>GET /raw/qcloudvoice</summary>
+<p>
+Response body:
+
+```json
+{
+    "config": {
+        "sdkappid": "dqpaGfzwZsdYPeOyCsiCnHuLe",
+        "appkey": "HQFbAYSZWVMAhuzBkneOovYpv",
+        "tplID": 39,
+        "playTimes": 49,
+        "tmplVarNames": [
+            "KyzjUzrBFcqQjedfJRHYoDbOG",
+            "nflOHIkugcnZOrqBkSazNWfPP"
+        ]
+    },
+    "data": {
+        "params": {
+            "RIsCQnfJqlpSCwrkkFbdBFIFj": "XXcLBedVQEUDCnYApsnqfVPTL"
+        },
+        "mobile": "13534814833"
+    }
+}
+```
+
+</p>
+</details>
+<details><summary>GET /raw/qywx</summary>
+<p>
+Response body:
+
+```json
+{
+    "config": {
+        "corpID": "uCgrmJMtqLPBCFhsvjTArsMmL",
+        "corpSecret": "gRHZGuimGqaWdWaBWJwkTAShU",
+        "agentID": "GjqWAhwRbpeHnQNxTNgmJjnxD"
+    },
+    "data": {
+        "msg": "SlooidCOblAgkzyWhxDcYtLJJ",
+        "userIds": [
+            "yFeNmhPfjtisROYMvzGXHlQpd",
+            "CUSPjJkWEEfDDKDOfOhAXkqgJ"
+        ]
+    }
+}
+```
+
+</p>
+</details>
+<details><summary>GET /raw/mail</summary>
+<p>
+Response body:
+
+```json
+{
+    "config": {
+        "smtpAddr": "xaQHabaoaboiqLQkrhnMSwTGo",
+        "smtpPort": 94,
+        "from": "CEVyoTJ@zTADH.biz",
+        "username": "gQVadOOpmwpHnlIyfsCCBulVP",
+        "pass": "NvMQhtbtbJgCkOErmOqWRCSKa"
+    },
+    "data": {
+        "subject": "kfYENjIqRgtAsNATTewtSQJtK",
+        "message": "nbUGDoWZCCUeCgZnqaHOhlDUc",
+        "to": [
+            "RyBZMmL@NbhCr.net",
+            "fKggIDs@WHkmM.net"
+        ]
+    }
+}
+```
+
+</p>
+</details>
+<details><summary>GET /raw/sms</summary>
+<p>
+Response body:
+
+```json
+{
+    "config": {
+        "configIds": [
+            "NCCNkSbvLCcEBYPRpErzuHOzu",
+            "qJoxwNVZfRxOytgzHbfYLSnNg"
+        ],
+        "random": false,
+        "retry": 0
+    },
+    "data": {
+        "templateParams": {
+            "CAatGFIenVaglyBHaqLGDVNDm": "HmVmUYwDzaKJZvYwyMqYAAowJ",
+            "uCbSRZgyNkgIntizzDrIHVOiy": "TNvBcIHcgrHoiKEGjEsktAKmn"
+        },
+        "mobiles": [
+            "14509804092"
+        ],
+        "retry": 0
     }
 }
 ```
