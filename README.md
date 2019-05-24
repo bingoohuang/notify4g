@@ -21,8 +21,8 @@ API document style refers to [White House Web API Standards](https://github.com/
 
 所有API都可以通过界面点击，然后在Chrome的开发工具的Network中查看详情。
 
-* [GET /raw/:channel](#get-rawchannel)
-* [POST /raw/:channel](#post-rawchannel)
+* 获得直接发送通知的请求体样例 [GET /raw/:channel](#get-rawchannel)
+* 直接根据配置和内容发送通知 [POST /raw/:channel](#post-rawchannel)
 * 获取配置详情 GET /config/:configID
 * 获得指定渠道配置样例 GET /config/:configID/:channel
 * 新增/保存配置 POST /config/:configID
