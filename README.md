@@ -17,7 +17,7 @@ notify api for sms/voice/qywx/mail/dingtalk
 
 ### API Resources
 
-* [GET /raw/:channel](#get-raw-channel)
+* [GET /raw/:channel](#get-rawchannel)
 * POST /raw/:channel
 * GET /config/:configID
 * GET /config/:configID/:channel
@@ -56,7 +56,6 @@ Response body:
 
 </p>
 </details>
-
 <details><summary>GET /raw/dingtalkrobot</summary>
 <p>
 Response body:
