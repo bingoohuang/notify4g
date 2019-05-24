@@ -48,7 +48,7 @@ $(function () {
 
         $.ajax({
             type: 'GET',
-            url: routerPath,
+            url: '/raw' + routerPath,
             success: function (content) {
                 reqEditor.setValue(JSON.stringify(content, null, 4));
                 rspEditor.setValue('{}');
@@ -65,10 +65,10 @@ $(function () {
 
         let editUrl = "";
         if ($(this).hasClass("New")) {
-            editUrl = /config/ + configID + routerPath;
+            editUrl = '/config/' + configID + routerPath;
             $('#configIDInput').val("")
         } else {
-            editUrl = /config/ + configID;
+            editUrl = '/config/' + configID;
             $('#configIDInput').val(configID)
         }
 
@@ -95,7 +95,7 @@ $(function () {
 
         $.ajax({
             type: 'GET',
-            url: /notify/ + configID,
+            url: '/notify/' + configID,
             success: function (content) {
                 reqEditor.setValue(JSON.stringify(content, null, 4));
                 rspEditor.setValue('{}');
@@ -109,7 +109,7 @@ $(function () {
         if (MODE === 1) {
             $.ajax({
                 type: 'POST',
-                url: routerPath,
+                url: '/raw' + routerPath,
                 processData: false,
                 data: reqEditor.getValue(),
                 success: function (content) {
@@ -120,7 +120,7 @@ $(function () {
         } else if (MODE === 2) {
             $.ajax({
                 type: 'POST',
-                url: /config/ + $('#configIDInput').val(),
+                url: '/config/' + $('#configIDInput').val(),
                 processData: false,
                 data: reqEditor.getValue(),
                 success: function (content) {
@@ -131,7 +131,7 @@ $(function () {
         } else if (MODE === 3) {
             $.ajax({
                 type: 'POST',
-                url: /notify/ + $('#configIDInput').val(),
+                url: '/notify/' + $('#configIDInput').val(),
                 processData: false,
                 data: reqEditor.getValue(),
                 success: function (content) {
@@ -145,7 +145,7 @@ $(function () {
     $('#btnDelete').click(function () {
         $.ajax({
             type: 'DELETE',
-            url: /config/ + $('#configIDInput').val(),
+            url: '/config/' + $('#configIDInput').val(),
             success: function (content) {
                 rspEditor.setValue(JSON.stringify(content, null, 4))
                 document.location.reload()
