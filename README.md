@@ -3,10 +3,23 @@ notify api for sms/voice/qywx/mail/dingtalk
 
 ## build
 
+for release:
+
+1. `sh build.sh local` for local
+1. `sh build.sh linux` for linux version
+ 
+
+for dev:
+
 1. `go get github.com/bingoohuang/statiq`
 1. `./buildres.sh`
 1. `statiq -src=res`
-1. `go fmt ./...; go build`
+1. `go fmt ./...;sh build.sh`
+
+## Startup example
+
+1. `./notify4g -i -s "~/notify4g/snapshot"` to init ctl shell scripts.
+1. or by `export NOTIFY4G_SNAPSHOTDIR=~/notify4g/snapshotenv` to specified snapshotDir.
 
 ## snapshots
 

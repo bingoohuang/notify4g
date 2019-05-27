@@ -23,6 +23,8 @@ func (s *SnapshotService) Init(dir string) error {
 		return err
 	}
 
+	logrus.Infof("Init snapshot dir %s", s.Dir)
+
 	return os.MkdirAll(s.Dir, os.ModePerm)
 }
 

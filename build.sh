@@ -3,7 +3,8 @@
 target=$1
 fast=$2
 
-bin=`basename "$PWD"`
+bin=notify4g
+#bin=`basename "$PWD"`
 
 echo bin:${bin}
 echo targetos:${target}

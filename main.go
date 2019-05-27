@@ -10,10 +10,13 @@ import (
 	"github.com/bingoohuang/statiq/fs"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"text/template"
 )
 
@@ -23,24 +26,18 @@ var (
 	buildTime string // when the executable was built
 )
 
-var addr *string
-var snapshotDir *string
-
 func init() {
 	help := pflag.BoolP("help", "h", false, "help")
-	v := pflag.BoolP("version", "v", false, "show version and exit")
-	addr = pflag.StringP("addr", "a", ":11472", "http address to listen and serve")
-	snapshotDir = pflag.StringP("snapshotDir", "s", "./etc/snapshots", "snapshots for config")
 	ipo := pflag.BoolP("init", "i", false, "init to create template config file and ctl.sh")
-	loglevel := pflag.StringP("loglevel", "l", "info", "debug/info/warn/error")
-	logrusEnabled := pflag.BoolP("logrus", "o", true, "enable logrus")
+	pflag.StringP("addr", "a", ":11472", "http address to listen and serve")
+	pflag.StringP("snapshotDir", "s", "./etc/snapshots", "snapshots for config")
+	pflag.StringP("loglevel", "l", "info", "debug/info/warn/error")
+	pflag.StringP("logdir", "d", "./var", "log dir")
+	pflag.BoolP("logrus", "o", true, "enable logrus")
 	pflag.Parse()
 
-	if *v {
-		fmt.Printf("Build on %s from sha1 %s\n", buildTime, sha1ver)
-		os.Exit(0)
-	}
 	if *help {
+		fmt.Printf("Build on %s from sha1 %s\n", buildTime, sha1ver)
 		pflag.PrintDefaults()
 		os.Exit(0)
 	}
@@ -52,10 +49,21 @@ func init() {
 		os.Exit(0)
 	}
 
+	viper.SetDefault("addr", ":11472")
+	viper.SetDefault("snapshotDir", "./etc/snapshots")
+	viper.SetDefault("loglevel", "info")
+	viper.SetDefault("logdir", "./var")
+	viper.SetDefault("logrus", false)
+
+	viper.SetEnvPrefix("notify4g")
+	viper.AutomaticEnv()
+
+	_ = viper.BindPFlags(pflag.CommandLine)
+
 	api.InitSha1verBuildTime(sha1ver, buildTime)
 
-	if *logrusEnabled {
-		gou.InitLogger(*loglevel, "./var", filepath.Base(os.Args[0])+".log")
+	if viper.GetBool("logrus") {
+		gou.InitLogger(viper.GetString("loglevel"), viper.GetString("logdir"), filepath.Base(os.Args[0])+".log")
 	} else {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
@@ -74,11 +82,12 @@ func main() {
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(sfs)))
 
-	api.InitConfigCache(*snapshotDir)
+	api.InitConfigCache(viper.GetString("snapshotDir"))
 
 	logrus.SetLevel(logrus.InfoLevel)
-	logrus.Infof("start to listen and serve on address %s", *addr)
-	logrus.Fatal(http.ListenAndServe(*addr, nil))
+	addr := viper.GetString("addr")
+	logrus.Infof("start to listen and serve on address %s", addr)
+	logrus.Fatal(http.ListenAndServe(addr, nil))
 }
 
 func ipoInit() error {
@@ -87,14 +96,14 @@ func ipoInit() error {
 		return err
 	}
 
-	if err = initCtl(sfs, "/ctl.tpl.sh", "./ctl", ""); err != nil {
+	if err = initCtl(sfs, "/ctl.tpl.sh", "./ctl"); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func initCtl(sfs *fs.StatiqFS, ctlTplName, ctlFilename, binArgs string) error {
+func initCtl(sfs *fs.StatiqFS, ctlTplName, ctlFilename string) error {
 	if _, err := os.Stat(ctlFilename); err == nil {
 		fmt.Println(ctlFilename + " already exists, ignored!")
 		return nil
@@ -110,8 +119,25 @@ func initCtl(sfs *fs.StatiqFS, ctlTplName, ctlFilename, binArgs string) error {
 		return err
 	}
 
+	binArgs := make([]string, 0, len(os.Args)-2)
+	for i, arg := range os.Args {
+		if i == 0 {
+			continue
+		}
+		if strings.Index(arg, "-i") == 0 || strings.Index(arg, "--init") == 0 {
+			continue
+		}
+
+		if strings.Index(arg, "-") != 0 {
+			arg = strconv.Quote(arg)
+		}
+
+		binArgs = append(binArgs, arg)
+	}
+
 	var content bytes.Buffer
-	if err := tpl.Execute(&content, map[string]string{"BinName": os.Args[0], "BinArgs": binArgs}); err != nil {
+	m := map[string]string{"BinName": os.Args[0], "BinArgs": strings.Join(binArgs, " ")}
+	if err := tpl.Execute(&content, m); err != nil {
 		return err
 	}
 
