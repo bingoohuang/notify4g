@@ -22,7 +22,7 @@ func InitSha1verBuildTime(sha1ver, buildTime string) {
 
 type NotifierItem struct {
 	Name      string
-	Path      string
+	Channel   string
 	ConfigIDs []string
 }
 
@@ -50,13 +50,13 @@ func HandleHome(homeTemplate string) func(w http.ResponseWriter, r *http.Request
 		})
 
 		items := []NotifierItem{
-			{Name: "阿里云短信", Path: "/" + aliyunsms, ConfigIDs: findConfigIDs(ids, aliyunsms)},
-			{Name: "钉钉机器人", Path: "/" + dingtalkrobot, ConfigIDs: findConfigIDs(ids, dingtalkrobot)},
-			{Name: "腾讯云短信", Path: "/" + qcloudsms, ConfigIDs: findConfigIDs(ids, qcloudsms)},
-			{Name: "腾讯云语音", Path: "/" + qcloudvoice, ConfigIDs: findConfigIDs(ids, qcloudvoice)},
-			{Name: "企业微信", Path: "/" + qywx, ConfigIDs: findConfigIDs(ids, qywx)},
-			{Name: "SMTP邮件", Path: "/" + mail, ConfigIDs: findConfigIDs(ids, mail)},
-			{Name: "聚合短信", Path: "/" + sms, ConfigIDs: findConfigIDs(ids, sms)},
+			{Name: "阿里云短信", Channel: aliyunsms, ConfigIDs: findConfigIDs(ids, aliyunsms)},
+			{Name: "钉钉机器人", Channel: dingtalkrobot, ConfigIDs: findConfigIDs(ids, dingtalkrobot)},
+			{Name: "腾讯云短信", Channel: qcloudsms, ConfigIDs: findConfigIDs(ids, qcloudsms)},
+			{Name: "腾讯云语音", Channel: qcloudvoice, ConfigIDs: findConfigIDs(ids, qcloudvoice)},
+			{Name: "企业微信", Channel: qywx, ConfigIDs: findConfigIDs(ids, qywx)},
+			{Name: "SMTP邮件", Channel: mail, ConfigIDs: findConfigIDs(ids, mail)},
+			{Name: "聚合短信", Channel: sms, ConfigIDs: findConfigIDs(ids, sms)},
 		}
 
 		homeTpl := template.Must(template.New("homeTpl").Parse(homeTemplate))
