@@ -38,6 +38,7 @@ if [[ ${target} = "linux" ]]; then
     bin=${bin}_linux_amd64
 fi
 
+go fmt ./...
 go build -ldflags "-w -s -X main.sha1ver=`git rev-parse HEAD` -X main.buildTime=$now" -o "${bin}"
 if [[ ${upx} = "yes" ]] && type upx > /dev/null 2>&1; then
     upx ${bin}
