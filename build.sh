@@ -1,33 +1,47 @@
 #!/bin/bash
 
-target=$1
-fast=$2
 
-bin=notify4g
-#bin=`basename "$PWD"`
+target=local
+upx=yes
+bin=`basename "$PWD"`
+
+function usage {
+	cat <<EOM
+Usage: $0 [OPTION]...
+
+  -t target   linux/local, default local
+  -u yes/no   enable upx compression if upx is available or not
+  -b          binary name, default ${bin}
+  -h          display help
+EOM
+}
+
+while getopts "t:b:u:h-:" optKey; do
+  case ${optKey} in
+    t) target=$OPTARG ;;
+    u) upx=$OPTARG ;;
+    b) bin=$OPTARG ;;
+    h|*) usage; exit 0;;
+    esac
+done
 
 echo bin:${bin}
-echo targetos:${target}
-echo fastmode:${fast}
+echo target:${target}
+echo upx:${upx}
 
 # notice how we avoid spaces in $now to avoid quotation hell in go build
 now=$(date +'%Y-%m-%d_%T')
 
 if [[ ${target} = "linux" ]]; then
-    echo "build for linux"
-    env GOOS=linux GOARCH=amd64 go build -ldflags "-w -s -X main.sha1ver=`git rev-parse HEAD` -X main.buildTime=$now" -o "${bin}_linux_amd64"
-    if [[ ${fast} != "fast" ]] && type upx > /dev/null 2>&1; then
-        upx ${bin}_linux_amd64
-    fi
-else
-    echo "build for local"
-    go build -ldflags "-w -s -X main.sha1ver=`git rev-parse HEAD` -X main.buildTime=$now"
-
-    if [[ ${fast} != "fast" ]] && type upx > /dev/null 2>&1; then
-        upx ${bin}
-    fi
+    export GOOS=linux
+    export GOARCH=amd64
+    bin=${bin}_linux_amd64
 fi
 
+go build -ldflags "-w -s -X main.sha1ver=`git rev-parse HEAD` -X main.buildTime=$now" -o "${bin}"
+if [[ ${upx} = "yes" ]] && type upx > /dev/null 2>&1; then
+    upx ${bin}
+fi
 
 # meaning of -ldflags '-w -s'
 # https://stackoverflow.com/questions/22267189/what-does-the-w-flag-mean-when-passed-in-via-the-ldflags-option-to-the-go-comman

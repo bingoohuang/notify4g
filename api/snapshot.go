@@ -1,11 +1,14 @@
 package api
 
 import (
+	"github.com/bingoohuang/gou"
 	"github.com/mitchellh/go-homedir"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 )
 
 type SnapshotService struct {
@@ -28,8 +31,13 @@ func (s *SnapshotService) Init(dir string) error {
 	return os.MkdirAll(s.Dir, os.ModePerm)
 }
 
+const DeletedAt = ".deletedAt."
+
 func (s SnapshotService) Delete(file string) error {
-	return os.Remove(filepath.Join(s.Dir, file))
+	from := filepath.Join(s.Dir, file)
+	to := filepath.Join(s.Dir, file+DeletedAt+gou.FormatDateLayout(time.Now(), "yyyyMMddHHmmss"))
+
+	return os.Rename(from, to)
 }
 
 func (s SnapshotService) Read(file string) ([]byte, error) {
@@ -49,14 +57,16 @@ func (s SnapshotService) Walk(fn func(file string, content []byte)) error {
 	}
 
 	for _, f := range files {
-		if !f.IsDir() {
-			b, err := s.Read(f.Name())
-			if err != nil {
-				return err
-			}
-
-			fn(f.Name(), b)
+		if f.IsDir() || strings.Index(f.Name(), DeletedAt) >= 0 {
+			continue
 		}
+
+		b, err := s.Read(f.Name())
+		if err != nil {
+			return err
+		}
+
+		fn(f.Name(), b)
 	}
 
 	return nil

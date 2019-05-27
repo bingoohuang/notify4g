@@ -5,9 +5,18 @@ notify api for sms/voice/qywx/mail/dingtalk
 
 for release:
 
-1. `sh build.sh local` for local
-1. `sh build.sh linux` for linux version
+1. `./build.sh` for local
+1. `./build.sh -t linux` for linux version
  
+```bash
+$ ./build.sh -h
+Usage: ./build.sh [OPTION]...
+
+  -t target   linux/local, default local
+  -u yes/no   enable upx compression if upx is available or not
+  -b          binary name, default notify4g
+  -h          display help
+```
 
 for dev:
 
@@ -34,6 +43,9 @@ for dev:
 1. `qyapi.weixin.qq.com:443`
 1. `mail.capmail.cn:25`
 
+## Curl scripts
+
+1. `curl 'http://127.0.0.1:11472/notify/sms100' --data '{"templateParams":{"code":"1234"},"mobiles":["18678901234"],"retry":0}'`
 
 ## Request & Response Examples
 

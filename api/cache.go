@@ -54,7 +54,9 @@ func (t *NotifyConfigCache) Read(key string) *NotifyConfig {
 	if len(content) != 0 {
 		c, _ := ParseNotifyConfig(content)
 		if c != nil {
-			t.Write(key, c, false)
+			if err := t.Write(key, c, false); err != nil {
+				logrus.Warnf("write snapshot failed %v", err)
+			}
 			return c
 		}
 	}
@@ -64,7 +66,10 @@ func (t *NotifyConfigCache) Read(key string) *NotifyConfig {
 
 func (t *NotifyConfigCache) Delete(key string) {
 	t.C.Delete(key)
-	t.Snapshot.Delete(key + ".json")
+	if err := t.Snapshot.Delete(key + ".json"); err != nil {
+		logrus.Warnf("delete snapshot failed %v", err)
+	}
+
 }
 
 func (t *NotifyConfigCache) Walk(fn func(k string, v *NotifyConfig)) {
