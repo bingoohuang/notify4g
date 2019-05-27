@@ -24,7 +24,7 @@ else
     go build -ldflags "-w -s -X main.sha1ver=`git rev-parse HEAD` -X main.buildTime=$now"
 
     if [[ ${fast} != "fast" ]] && type upx > /dev/null 2>&1; then
-        upx rig
+        upx ${bin}
     fi
 fi
 
