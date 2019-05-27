@@ -25,6 +25,15 @@ for dev:
 
 ![image](doc/snapshot20190523141355.png)
 
+## outer network required
+
+1. `dysmsapi.aliyuncs.com:80`
+1. `oapi.dingtalk.com:443`
+1. `yun.tim.qq.com:443`
+1. `cloud.tim.qq.com:443`
+1. `qyapi.weixin.qq.com:443`
+1. `mail.capmail.cn:25`
+
 
 ## Request & Response Examples
 
