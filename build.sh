@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -x #echo on
 
 target=local
 upx=yes
