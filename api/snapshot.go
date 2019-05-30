@@ -57,7 +57,7 @@ func (s SnapshotService) Walk(fn func(file string, content []byte)) error {
 	}
 
 	for _, f := range files {
-		if f.IsDir() || strings.Index(f.Name(), DeletedAt) >= 0 {
+		if f.IsDir() || strings.Contains(f.Name(), DeletedAt) {
 			continue
 		}
 
@@ -93,7 +93,7 @@ func (s SnapshotService) RecoverCache(c *NotifyConfigCache) error {
 
 		config, _ := ParseNotifyConfig(content)
 		if config != nil {
-			c.Write(id, config, false)
+			_ = c.Write(id, config, false)
 		}
 	})
 }
