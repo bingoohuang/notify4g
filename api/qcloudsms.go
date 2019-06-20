@@ -33,12 +33,12 @@ func (q *QcloudSms) Config(config string) error {
 	return nil
 }
 
-func (s *QcloudSms) InitMeaning() {
-	s.Sdkappid = "sdkappid"
-	s.Appkey = "appkey"
-	s.TplID = 157749
-	s.Sign = "短信签名，可以为空"
-	s.TmplVarNames = []string{"var1", "var2"}
+func (q *QcloudSms) InitMeaning() {
+	q.Sdkappid = "sdkappid"
+	q.Appkey = "appkey"
+	q.TplID = 157749
+	q.Sign = "短信签名，可以为空"
+	q.TmplVarNames = []string{"var1", "var2"}
 }
 
 // Tel 表示电话号码
