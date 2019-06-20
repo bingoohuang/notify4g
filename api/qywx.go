@@ -2,9 +2,10 @@ package api
 
 import (
 	"errors"
+	"strings"
+
 	"github.com/bingoohuang/gou"
 	"github.com/sirupsen/logrus"
-	"strings"
 )
 
 // QywxTokenResult 表示企业微信的令牌结果

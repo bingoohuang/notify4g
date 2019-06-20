@@ -3,6 +3,14 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"text/template"
+
 	"github.com/bingoohuang/faker"
 	"github.com/bingoohuang/gou"
 	"github.com/bingoohuang/notify4g/api"
@@ -11,13 +19,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"path/filepath"
-	"strconv"
-	"strings"
-	"text/template"
 )
 
 // refer : https://blog.kowalczyk.info/article/vEja/embedding-build-number-in-go-executable.html

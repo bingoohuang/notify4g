@@ -3,11 +3,12 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/bingoohuang/faker"
 	"github.com/bingoohuang/gou"
 	"github.com/pkg/errors"
-	"net/http"
-	"strings"
 )
 
 type Config interface {

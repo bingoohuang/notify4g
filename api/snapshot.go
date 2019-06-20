@@ -1,14 +1,15 @@
 package api
 
 import (
-	"github.com/bingoohuang/gou"
-	"github.com/mitchellh/go-homedir"
-	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/bingoohuang/gou"
+	"github.com/mitchellh/go-homedir"
+	"github.com/sirupsen/logrus"
 )
 
 type SnapshotService struct {

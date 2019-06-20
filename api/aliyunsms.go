@@ -1,10 +1,11 @@
 package api
 
 import (
+	"net/url"
+
 	"github.com/bingoohuang/gou"
 	"github.com/sirupsen/logrus"
 	"github.com/tobyzxj/uuid"
-	"net/url"
 
 	"strings"
 	"time"

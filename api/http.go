@@ -2,12 +2,13 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/bingoohuang/faker"
-	"github.com/bingoohuang/gou"
 	"html/template"
 	"net/http"
 	"sort"
 	"strings"
+
+	"github.com/bingoohuang/faker"
+	"github.com/bingoohuang/gou"
 )
 
 var (
