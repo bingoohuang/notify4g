@@ -78,7 +78,7 @@ TemplateCode|是| 短信模板CODE。
 }
 ```
 
-模板示例: `应用:${appName} 监控埋点:${warnSrc} 在近${winMInutes}分钟内发生${warning}, 其中最高${max}, 最低${min}`
+模板示例: `应用:${appName} 监控埋点:${warnSrc} 在近${withMinutes}分钟内发生${warning}, 其中最高${max}, 最低${min}`
 
 
 ![image](https://user-images.githubusercontent.com/1940588/60090827-d3afea80-9775-11e9-99a5-a42e6d9420b4.png)
