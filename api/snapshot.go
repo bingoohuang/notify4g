@@ -47,7 +47,7 @@ func (s SnapshotService) Read(file string) ([]byte, error) {
 
 func (s SnapshotService) Write(file string, content []byte) error {
 	cf := filepath.Join(s.Dir, file)
-	err := ioutil.WriteFile(cf, []byte(content), 0644)
+	err := ioutil.WriteFile(cf, content, 0644)
 	return err
 }
 

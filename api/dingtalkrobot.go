@@ -34,7 +34,7 @@ type DingtalkReq struct {
 }
 
 // Notify 发送信息
-func (s Dingtalk) Notify(request interface{}) NotifyRsp {
+func (s Dingtalk) Notify(app *App, request interface{}) NotifyRsp {
 	req := request.(*DingtalkReq)
 	robot := Robot{Webhook: "https://oapi.dingtalk.com/robot/send?access_token=" + s.AccessToken}
 	rsp, err := robot.SendText(req.Message, req.AtMobiles, req.AtAll)
@@ -84,10 +84,11 @@ func (r Robot) SendMarkdown(title, text string, atMobiles []string, isAtAll bool
 }
 
 // SendActionCard send a action card type message.
-func (r Robot) SendActionCard(title, text, singleTitle, singleURL, btnOrientation, hideAvatar string) (DingResponse, error) {
+func (r Robot) SendActionCard(title, text, singleTitle, singleURL, btnOrient, hideAvatar string) (DingResponse, error) {
 	return r.send(&actionCardMessage{
-		MsgType:    msgTypeActionCard,
-		ActionCard: actionCardParams{Title: title, Text: text, SingleTitle: singleTitle, SingleURL: singleURL, BtnOrientation: btnOrientation, HideAvatar: hideAvatar},
+		MsgType: msgTypeActionCard,
+		ActionCard: actionCardParams{Title: title, Text: text, SingleTitle: singleTitle,
+			SingleURL: singleURL, BtnOrientation: btnOrient, HideAvatar: hideAvatar},
 	})
 }
 

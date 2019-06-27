@@ -99,7 +99,7 @@ func (s Qywx) NewRequest() interface{} { return &QywxReq{} }
 func (s Qywx) ChannelName() string     { return qywx }
 
 // Notify 发送企业消息
-func (s Qywx) Notify(request interface{}) NotifyRsp {
+func (s Qywx) Notify(app *App, request interface{}) NotifyRsp {
 	r := request.(*QywxReq)
 	rsp, err := FastSendQywxMsg(s.CorpID, s.CorpSecret, s.AgentID, r.Msg, r.UserIds)
 

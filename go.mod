@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/bingoohuang/faker v0.0.0-20190521151430-dcff11ac7f06
-	github.com/bingoohuang/gou v0.0.0-20190527053107-65a1ed05351e
+	github.com/bingoohuang/gou v0.0.0-20190627060828-ff1e7cf178f2
 	github.com/bingoohuang/statiq v0.2.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
@@ -17,5 +17,3 @@ require (
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
-
-replace github.com/tdewolff/parse => github.com/tdewolff/parse v0.0.0-20181024085210-fced451e0bed

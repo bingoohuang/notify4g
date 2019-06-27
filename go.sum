@@ -15,8 +15,8 @@ github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
 github.com/bingoohuang/faker v0.0.0-20190521151430-dcff11ac7f06 h1:2RPOOgUID63wG/VotQLnTZ1E7kyp53DjOnhfkfE8rHA=
 github.com/bingoohuang/faker v0.0.0-20190521151430-dcff11ac7f06/go.mod h1:a/SwpaoIQvCHzQ7LYuRV7xzx/NDYddcI5xfQdvBRxwg=
-github.com/bingoohuang/gou v0.0.0-20190527053107-65a1ed05351e h1:W+dtI6eFX23XRGuZ7PI943pixRbJEKe9XDw1vuGTesc=
-github.com/bingoohuang/gou v0.0.0-20190527053107-65a1ed05351e/go.mod h1:xhMGdgCGKCUkHF00h4b0qMA50fFe0sSV9DD844rIaYQ=
+github.com/bingoohuang/gou v0.0.0-20190627060828-ff1e7cf178f2 h1:h413gnxg7jl83zmZnLK7t8tpThHcHUuLOVyr3DLSidY=
+github.com/bingoohuang/gou v0.0.0-20190627060828-ff1e7cf178f2/go.mod h1:lcrqMdkt83WIJsaF9zqIzNqR8S6TusM8GxxUzkTR8HE=
 github.com/bingoohuang/statiq v0.2.1 h1:L7Uya0pM+wbw4CYkF9DVMJ0h0aSUx4mb0X7udk/M7NA=
 github.com/bingoohuang/statiq v0.2.1/go.mod h1:0b9LPVgSSJpbpSBpJqUH7GnuwbYisd32WPxXIo5AMHQ=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
@@ -148,8 +148,8 @@ github.com/stretchr/testify v1.3.0 h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/tdewolff/minify v2.3.6+incompatible h1:2hw5/9ZvxhWLvBUnHE06gElGYz+Jv9R4Eys0XUzItYo=
 github.com/tdewolff/minify v2.3.6+incompatible/go.mod h1:9Ov578KJUmAWpS6NeZwRZyT56Uf6o3Mcz9CEsg8USYs=
-github.com/tdewolff/parse v0.0.0-20181024085210-fced451e0bed h1:klWq36nIlAluRqGkEWbxDun2/DvFgMmaXPY7cOOcQ9Q=
-github.com/tdewolff/parse v0.0.0-20181024085210-fced451e0bed/go.mod h1:VU2NXhgFt7DDbxJutH6tr7IA3bKM43L8+zft2deFFT8=
+github.com/tdewolff/parse v2.3.4+incompatible h1:x05/cnGwIMf4ceLuDMBOdQ1qGniMoxpP46ghf0Qzh38=
+github.com/tdewolff/parse v2.3.4+incompatible/go.mod h1:8oBwCsVmUkgHO8M5iCzSIDtpzXOT0WXX9cWhz+bIzJQ=
 github.com/tdewolff/test v1.0.0 h1:jOwzqCXr5ePXEPGJaq2ivoR6HOCi+D5TPfpoyg8yvmU=
 github.com/tdewolff/test v1.0.0/go.mod h1:DiQUlutnqlEvdvhSn2LPGy4TFwRauAaYDsL+683RNX4=
 github.com/tebeka/strftime v0.0.0-20140926081919-3f9c7761e312 h1:frNEkk4P8mq+47LAMvj9LvhDq01kFDUhpJZzzei8IuM=

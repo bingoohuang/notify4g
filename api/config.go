@@ -13,16 +13,18 @@ import (
 
 type Config interface {
 	Config(config string) error
-	Notify(req interface{}) NotifyRsp
+	Notify(app *App, req interface{}) NotifyRsp
 	ChannelName() string
 	InitMeaning()
 	NewRequest() interface{}
 }
 
-var ConfigCache *NotifyConfigCache
+type App struct {
+	configCache *NotifyConfigCache
+}
 
-func InitConfigCache(snapshotDir string) {
-	ConfigCache = NewCache(snapshotDir)
+func CreateApp(snapshotDir string) *App {
+	return &App{configCache: NewCache(snapshotDir)}
 }
 
 type RawNotifyConfig struct {
@@ -75,30 +77,30 @@ func NewConfig(typ string) (Config, error) {
 	return nil, errors.New("unknown config type " + typ)
 }
 
-func NotifyByConfig(removePath string) func(w http.ResponseWriter, r *http.Request) {
+func (a *App) NotifyByConfig(removePath string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		subs := strings.SplitN(r.URL.Path[len(removePath):], "/", -1)
 		if len(subs) != 1 {
 			_ = WriteErrorJSON(400, w, Rsp{Status: 400, Message: "invalid path"})
 			return
 		}
-		configId := subs[0]
+		configID := subs[0]
 
 		switch r.Method {
-		case "GET":
-			_ = prepareNotify(w, configId)
-		case "POST":
-			_ = postNotify(w, r, configId)
+		case GET:
+			_ = a.prepareNotify(w, configID)
+		case POST:
+			_ = a.postNotify(w, r, configID)
 		default:
 			_ = WriteErrorJSON(404, w, Rsp{Status: 404, Message: "Not Found"})
 		}
 	}
 }
 
-func prepareNotify(w http.ResponseWriter, configId string) error {
-	c := ConfigCache.Read(configId)
+func (a *App) prepareNotify(w http.ResponseWriter, configID string) error {
+	c := a.configCache.Read(configID)
 	if c == nil {
-		return WriteErrorJSON(404, w, Rsp{Status: 404, Message: "configId " + configId + " not found"})
+		return WriteErrorJSON(404, w, Rsp{Status: 404, Message: "configID " + configID + " not found"})
 	}
 
 	req := c.Config.NewRequest()
@@ -106,10 +108,10 @@ func prepareNotify(w http.ResponseWriter, configId string) error {
 	return WriteJSON(w, req)
 }
 
-func postNotify(w http.ResponseWriter, r *http.Request, configId string) error {
-	c := ConfigCache.Read(configId)
+func (a *App) postNotify(w http.ResponseWriter, r *http.Request, configID string) error {
+	c := a.configCache.Read(configID)
 	if c == nil {
-		return WriteErrorJSON(404, w, Rsp{Status: 404, Message: "configId " + configId + " not found"})
+		return WriteErrorJSON(404, w, Rsp{Status: 404, Message: "configID " + configID + " not found"})
 	}
 
 	req := c.Config.NewRequest()
@@ -117,33 +119,33 @@ func postNotify(w http.ResponseWriter, r *http.Request, configId string) error {
 		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: err.Error()})
 	}
 
-	rsp := NotifyByConfigID(configId, req)
+	rsp := a.NotifyByConfigID(configID, req)
 	return WriteJSON(w, rsp)
 }
 
-func NotifyByConfigID(configId string, req interface{}) NotifyRsp {
-	c := ConfigCache.Read(configId)
+func (a *App) NotifyByConfigID(configID string, req interface{}) NotifyRsp {
+	c := a.configCache.Read(configID)
 	if c == nil {
-		return MakeRsp(fmt.Errorf("configId %s not found", configId), false, "", nil)
+		return MakeRsp(fmt.Errorf("configID %s not found", configID), false, "", nil)
 	}
 
-	rsp := c.Config.Notify(req)
+	rsp := c.Config.Notify(a, req)
 	return rsp
 }
 
-func ServeByConfig(path string) func(w http.ResponseWriter, r *http.Request) {
+func (a *App) ServeByConfig(path string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		p := r.URL.Path[len(path):]
 		subs := strings.SplitN(p, "/", -1)
 
 		l := len(subs)
 		switch r.Method {
-		case "GET":
-			_ = GetConfig(w, l, subs)
-		case "POST":
-			_ = PostConfig(w, r, l, subs)
+		case GET:
+			_ = a.GetConfig(w, l, subs)
+		case POST:
+			_ = a.PostConfig(w, r, l, subs)
 		case "DELETE":
-			_ = DeleteConfig(w, l, subs)
+			_ = a.DeleteConfig(w, l, subs)
 		default:
 			_ = WriteErrorJSON(404, w, Rsp{Status: 404, Message: "Not Found"})
 		}
@@ -155,16 +157,16 @@ type Rsp struct {
 	Message string
 }
 
-func DeleteConfig(w http.ResponseWriter, l int, subs []string) error {
+func (a *App) DeleteConfig(w http.ResponseWriter, l int, subs []string) error {
 	if l != 1 {
 		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: "invalid path"})
 	}
 
-	ConfigCache.Delete(subs[0])
+	a.configCache.Delete(subs[0])
 	return WriteJSON(w, Rsp{Status: 200, Message: "OK"})
 }
 
-func PostConfig(w http.ResponseWriter, r *http.Request, l int, subs []string) error {
+func (a *App) PostConfig(w http.ResponseWriter, r *http.Request, l int, subs []string) error {
 	if l != 1 {
 		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: "invalid path"})
 	}
@@ -175,16 +177,16 @@ func PostConfig(w http.ResponseWriter, r *http.Request, l int, subs []string) er
 		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: err.Error()})
 	}
 
-	configId := subs[0]
-	_ = ConfigCache.Write(configId, config, true)
+	configID := subs[0]
+	_ = a.configCache.Write(configID, config, true)
 	return WriteJSON(w, Rsp{Status: 200, Message: "OK"})
 }
 
-func GetConfig(w http.ResponseWriter, l int, subs []string) error {
+func (a *App) GetConfig(w http.ResponseWriter, l int, subs []string) error {
 	if l != 1 && l != 2 {
 		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: "invalid path"})
 	}
-	configId := subs[0]
+	configID := subs[0]
 	if l == 2 {
 		config, err := NewConfig(subs[1])
 		if err != nil {
@@ -195,9 +197,9 @@ func GetConfig(w http.ResponseWriter, l int, subs []string) error {
 		return WriteJSON(w, NotifyConfig{Type: subs[1], Config: config})
 	}
 
-	c := ConfigCache.Read(configId)
+	c := a.configCache.Read(configID)
 	if c == nil {
-		return WriteErrorJSON(404, w, Rsp{Status: 404, Message: "configId " + configId + " not found"})
+		return WriteErrorJSON(404, w, Rsp{Status: 404, Message: "configID " + configID + " not found"})
 	}
 
 	return WriteJSON(w, c)

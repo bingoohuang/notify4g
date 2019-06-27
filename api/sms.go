@@ -42,7 +42,7 @@ const BreakIterating = true
 const ContinueIterating = false
 
 // Notify 发送短信
-func (r Sms) Notify(request interface{}) NotifyRsp {
+func (r Sms) Notify(app *App, request interface{}) NotifyRsp {
 	req := request.(*SmsReq)
 
 	retry := 0
@@ -54,7 +54,7 @@ func (r Sms) Notify(request interface{}) NotifyRsp {
 	var channelName string
 
 	f := func(configID string) bool {
-		nc := ConfigCache.Read(configID)
+		nc := app.configCache.Read(configID)
 		if nc == nil {
 			err = fmt.Errorf("configID %s not found", configID)
 			return BreakIterating
@@ -69,7 +69,7 @@ func (r Sms) Notify(request interface{}) NotifyRsp {
 
 		channelName = nc.Config.ChannelName()
 		r := smsNotifier.ConvertRequest(req)
-		rsp = nc.Config.Notify(r)
+		rsp = nc.Config.Notify(app, r)
 		if rsp.Status == 200 {
 			succ = true
 			return BreakIterating
@@ -78,9 +78,9 @@ func (r Sms) Notify(request interface{}) NotifyRsp {
 		if retry < maxRetry {
 			retry++
 			return ContinueIterating
-		} else {
-			return BreakIterating
 		}
+
+		return BreakIterating
 	}
 
 	gou.IterateSlice(r.ConfigIds, r.startIndex(), f)

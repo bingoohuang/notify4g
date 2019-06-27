@@ -7,19 +7,11 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/bingoohuang/notify4g/util"
+
 	"github.com/bingoohuang/faker"
 	"github.com/bingoohuang/gou"
 )
-
-var (
-	Sha1ver   string // sha1 revision used to build the program
-	BuildTime string // when the executable was built
-)
-
-func InitSha1verBuildTime(sha1ver, buildTime string) {
-	Sha1ver = sha1ver
-	BuildTime = buildTime
-}
 
 type NotifierItem struct {
 	Name      string
@@ -33,20 +25,10 @@ type HomeData struct {
 	Items     []NotifierItem
 }
 
-const (
-	aliyunsms     = "aliyunsms"
-	dingtalkrobot = "dingtalkrobot"
-	qcloudsms     = "qcloudsms"
-	qcloudvoice   = "qcloudvoice"
-	qywx          = "qywx"
-	mail          = "mail"
-	sms           = "sms"
-)
-
-func HandleHome(homeTemplate string) func(w http.ResponseWriter, r *http.Request) {
+func HandleHome(app *App, homeTemplate string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ids := gou.MakeMultiMap()
-		ConfigCache.Walk(func(k string, v *NotifyConfig) {
+		app.configCache.Walk(func(k string, v *NotifyConfig) {
 			ids.Put(v.Type, k)
 		})
 
@@ -61,7 +43,7 @@ func HandleHome(homeTemplate string) func(w http.ResponseWriter, r *http.Request
 		}
 
 		homeTpl := template.Must(template.New("homeTpl").Parse(homeTemplate))
-		if err := homeTpl.Execute(w, HomeData{Sha1ver: Sha1ver, BuildTime: BuildTime, Items: items}); err != nil {
+		if err := homeTpl.Execute(w, HomeData{Sha1ver: util.Version, BuildTime: util.Compile, Items: items}); err != nil {
 			http.Error(w, err.Error(), 400)
 		}
 	}
@@ -80,7 +62,7 @@ func findConfigIDs(m *gou.MultiMap, configType string) []string {
 }
 
 type Tester interface {
-	Send() NotifyRsp
+	Send(*App) NotifyRsp
 }
 
 type AliyunsmsTester struct {
@@ -118,21 +100,21 @@ type SmsTester struct {
 	Data   SmsReq `json:"data"`
 }
 
-func (r AliyunsmsTester) Send() NotifyRsp      { return r.Config.Notify(&r.Data) }
-func (r DingtalkReqTester) Send() NotifyRsp    { return r.Config.Notify(&r.Data) }
-func (r QcloudSmsReqTester) Send() NotifyRsp   { return r.Config.Notify(&r.Data) }
-func (r QcloudSmsVoiceTester) Send() NotifyRsp { return r.Config.Notify(&r.Data) }
-func (r QywxTester) Send() NotifyRsp           { return r.Config.Notify(&r.Data) }
-func (r MailTester) Send() NotifyRsp           { return r.Config.Notify(&r.Data) }
-func (r SmsTester) Send() NotifyRsp            { return r.Config.Notify(&r.Data) }
+func (r AliyunsmsTester) Send(app *App) NotifyRsp      { return r.Config.Notify(app, &r.Data) }
+func (r DingtalkReqTester) Send(app *App) NotifyRsp    { return r.Config.Notify(app, &r.Data) }
+func (r QcloudSmsReqTester) Send(app *App) NotifyRsp   { return r.Config.Notify(app, &r.Data) }
+func (r QcloudSmsVoiceTester) Send(app *App) NotifyRsp { return r.Config.Notify(app, &r.Data) }
+func (r QywxTester) Send(app *App) NotifyRsp           { return r.Config.Notify(app, &r.Data) }
+func (r MailTester) Send(app *App) NotifyRsp           { return r.Config.Notify(app, &r.Data) }
+func (r SmsTester) Send(app *App) NotifyRsp            { return r.Config.Notify(app, &r.Data) }
 
-func HandleRaw(path string) func(w http.ResponseWriter, r *http.Request) {
+func HandleRaw(app *App, path string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		_ = handleRawInternal(path, w, r)
+		_ = handleRawInternal(app, path, w, r)
 	}
 }
 
-func handleRawInternal(path string, w http.ResponseWriter, r *http.Request) error {
+func handleRawInternal(app *App, path string, w http.ResponseWriter, r *http.Request) error {
 	subs := strings.SplitN(r.URL.Path[len(path):], "/", -1)
 	if len(subs) != 1 {
 		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: "invalid path"})
@@ -145,15 +127,15 @@ func handleRawInternal(path string, w http.ResponseWriter, r *http.Request) erro
 	}
 
 	switch r.Method {
-	case "GET":
+	case GET:
 		_ = faker.Fake(tester)
 		return WriteJSON(w, tester)
-	case "POST":
+	case POST:
 		if err := json.NewDecoder(r.Body).Decode(tester); err != nil {
 			return WriteErrorJSON(400, w, Rsp{Status: 400, Message: err.Error()})
 		}
 
-		rsp := tester.Send()
+		rsp := tester.Send(app)
 		return WriteJSON(w, rsp)
 	default:
 		return WriteErrorJSON(404, w, Rsp{Status: 404, Message: "Not Found"})

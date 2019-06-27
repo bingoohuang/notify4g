@@ -56,20 +56,22 @@ type RawQcloudVoiceReq struct {
 	TplID     int      `json:"tpl_id"`                       // 模板 ID，在控制台审核通过的模板 ID
 	Params    []string `json:"params"`                       // 模板参数，若模板没有参数，请提供为空数组
 	PlayTimes int      `json:"playtimes" faker:"enum=1/2/3"` // 播放次数，可选，最多3次，默认2次。
-	Sig       string   `json:"sig"`                          // App 凭证，计算公式：sha256（appkey=$appkey&random=$random&time=$time&mobile=$mobile）
-	Tel       Tel      `json:"tel"`
-	Time      int64    `json:"time"` // 请求发起时间，UNIX 时间戳（单位：秒），如果和系统时间相差超过 10 分钟则会返回失败
-	Ext       string   `json:"ext"`  // 用户的 session 内容，腾讯 server 回包中会原样返回，可选字段，不需要就填空
+
+	Sig  string `json:"sig"` // App 凭证，计算公式：sha256（appkey=$appkey&random=$random&time=$time&mobile=$mobile）
+	Tel  Tel    `json:"tel"`
+	Time int64  `json:"time"` // 请求发起时间，UNIX 时间戳（单位：秒），如果和系统时间相差超过 10 分钟则会返回失败
+	Ext  string `json:"ext"`  // 用户的 session 内容，腾讯 server 回包中会原样返回，可选字段，不需要就填空
 }
 
 func (s QcloudVoice) NewRequest() interface{} { return &QcloudVoiceReq{} }
 func (s QcloudVoice) ChannelName() string     { return qcloudvoice }
 
 // 语音短信模板ID：326476   应用:{1} 监控埋点:{2} 在近{3}分钟内发生{4}, 其中最高{5}, 最低{6}
-// 示例：应用:logcenter-flume 监控埋点:events成功写入kafka的数量#mssp_server_sink#192_168_22_1 在近10分钟内发生连续7次请求次数等于0.0, 其中最高2300.0, 最低1800.0
+// 示例：应用:logcenter-flume 监控埋点:events成功写入kafka的数量#mssp_server_sink#192_168_22_1
+// 在近10分钟内发生连续7次请求次数等于0.0, 其中最高2300.0, 最低1800.0
 
 // Notify 发送信息
-func (s QcloudVoice) Notify(request interface{}) NotifyRsp {
+func (s QcloudVoice) Notify(app *App, request interface{}) NotifyRsp {
 	r := request.(*QcloudVoiceReq)
 
 	rando := gou.RandomIntAsString()
