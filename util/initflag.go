@@ -17,11 +17,12 @@ import (
 func InitFlags() {
 	help := pflag.BoolP("help", "h", false, "help")
 	ipo := pflag.BoolP("init", "i", false, "init to create template config file and ctl.sh")
-	pflag.StringP("addr", "a", ":30057", "http address to listen and serve")
+	pflag.StringP("addr", "a", ":11472", "http address to listen and serve")
 	pflag.StringP("loglevel", "l", "info", "debug/info/warn/error")
 	pflag.StringP("logdir", "d", "./var", "log dir")
 	pflag.BoolP("logrus", "o", true, "enable logrus")
-	pflag.BoolP("ui", "u", false, "enable simple ui")
+	pflag.StringP("snapshotDir", "s", "./etc/snapshots", "snapshots for config")
+
 	pprofAddr := gou.PprofAddrPflag()
 
 	// Add more pflags can be set from command line
