@@ -20,7 +20,7 @@ func main() {
 
 	app := api.CreateApp(viper.GetString("snapshotDir"))
 
-	http.HandleFunc("/", api.HandleHome(app, string(sfs.Files["/home.html"].Data)))
+	http.HandleFunc("/", auth(api.HandleHome(app, string(sfs.Files["/home.html"].Data))))
 	http.HandleFunc("/raw/", api.HandleRaw(app, "/raw/"))
 
 	http.HandleFunc("/config/", app.ServeByConfig("/config/"))
@@ -32,4 +32,24 @@ func main() {
 	addr := viper.GetString("addr")
 	logrus.Infof("start to listen and serve on address %s", addr)
 	logrus.Fatal(http.ListenAndServe(addr, nil))
+}
+
+func auth(fn http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, pass, _ := r.BasicAuth()
+		if !check(user, pass) {
+			w.Header().Set("WWW-Authenticate", `Basic realm="Notify4g Server"`)
+			http.Error(w, "Unauthorized.", 401)
+			return
+		}
+		fn(w, r)
+	}
+}
+
+func check(username, password string) bool {
+	basicAuth := viper.GetString("auth")
+	if basicAuth == "" {
+		return true
+	}
+	return username+":"+password == basicAuth
 }

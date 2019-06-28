@@ -20,6 +20,7 @@ func InitFlags() {
 	pflag.StringP("addr", "a", ":11472", "http address to listen and serve")
 	pflag.StringP("loglevel", "l", "info", "debug/info/warn/error")
 	pflag.StringP("logdir", "d", "./var", "log dir")
+	pflag.StringP("auth", "u", "", "basic auth username and password eg admin:admin")
 	pflag.BoolP("logrus", "o", true, "enable logrus")
 	pflag.StringP("snapshotDir", "s", "./etc/snapshots", "snapshots for config")
 
