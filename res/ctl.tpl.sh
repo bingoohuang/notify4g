@@ -5,7 +5,7 @@ mkdir -p var
 
 #set -x #echo on
 
-app=./go-starter
+app={{ .BinName }}
 pidFile=var/pid
 moreArgs="${*:2}"
 
@@ -22,7 +22,7 @@ function check_pid() {
 
   # remove prefix ./
   local pureAppName=${app#"./"}
-  local running=$(pgrep -l $pureAppName | awk '{print $1}')
+  local running=$(ps -ef | grep $pureAppName | grep -v "grep" | awk '{print $2}')
   if [[ -n ${running} ]]; then
     echo "${running}" >${pidFile}
     echo "${running}"
