@@ -88,7 +88,7 @@ TemplateCode|是| 短信模板CODE。
 参数 |是否必须 |	说明
 ----|--------|-----
 sdkappid|是| SDKAPPID即短信应用ID，用以区分用户腾讯云账号下不同业务。
-appkey|是| AccessKeySecret是用来验证用户的密钥。AccessKeySecret必须保密。
+appkey|是| sdkappid对应的 appkey，需要业务方高度保密。
 tplID|是| 模板ID，在 控制台 审核通过的模板 ID。
 
 示例:
