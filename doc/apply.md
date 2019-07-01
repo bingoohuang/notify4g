@@ -33,7 +33,7 @@ agentid |	是	 |企业应用的id，整型。可在应用的设置页面查看
 
 参数 |是否必须 |	说明
 ----|--------|-----
-accessToken|是| 自定义机器人hook地址中的accessToken
+accessToken|是| 自定义机器人Hook地址中的accessToken
 
 
 示例:
