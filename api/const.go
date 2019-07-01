@@ -5,6 +5,7 @@ const (
 	POST = "POST"
 
 	aliyunsms     = "aliyunsms"
+	aliyundayusms = "aliyundayusms"
 	dingtalkrobot = "dingtalkrobot"
 	qcloudsms     = "qcloudsms"
 	qcloudvoice   = "qcloudvoice"

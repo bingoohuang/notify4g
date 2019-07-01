@@ -70,7 +70,8 @@ type NotifyConfig struct {
 
 func NewConfig(typ string) (Config, error) {
 	v := gou.Decode(typ, "aliyunsms", &AliyunSms{}, "dingtalkrobot", &Dingtalk{},
-		"qcloudsms", &QcloudSms{}, "qcloudvoice", &QcloudVoice{}, "qywx", &Qywx{}, "mail", &Mail{}, "sms", &Sms{})
+		"qcloudsms", &QcloudSms{}, "qcloudvoice", &QcloudVoice{}, "qywx", &Qywx{}, "mail", &Mail{}, "sms", &Sms{},
+		"aliyundayusms", &AliyunDaYuSms{})
 	if v != nil {
 		return v.(Config), nil
 	}
