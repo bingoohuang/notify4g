@@ -39,7 +39,7 @@ func auth(fn http.HandlerFunc) http.HandlerFunc {
 		user, pass, _ := r.BasicAuth()
 		if !check(user, pass) {
 			w.Header().Set("WWW-Authenticate", `Basic realm="Notify4g Server"`)
-			http.Error(w, "Unauthorized.", 401)
+			http.Error(w, "Unauthorized.", http.StatusUnauthorized)
 			return
 		}
 		fn(w, r)
@@ -48,8 +48,5 @@ func auth(fn http.HandlerFunc) http.HandlerFunc {
 
 func check(username, password string) bool {
 	basicAuth := viper.GetString("auth")
-	if basicAuth == "" {
-		return true
-	}
-	return username+":"+password == basicAuth
+	return basicAuth == "" || username+":"+password == basicAuth
 }

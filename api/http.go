@@ -71,6 +71,11 @@ type AliyunsmsTester struct {
 	Data   AliyunSmsReq `json:"data"`
 }
 
+type AlidayuTester struct {
+	Config AliyunDaYuSms    `json:"config"`
+	Data   AliyunDaYuSmsReq `json:"data"`
+}
+
 type DingtalkReqTester struct {
 	Config Dingtalk    `json:"config"`
 	Data   DingtalkReq `json:"data"`
@@ -101,6 +106,7 @@ type SmsTester struct {
 	Data   SmsReq `json:"data"`
 }
 
+func (r AlidayuTester) Send(app *App) NotifyRsp        { return r.Config.Notify(app, &r.Data) }
 func (r AliyunsmsTester) Send(app *App) NotifyRsp      { return r.Config.Notify(app, &r.Data) }
 func (r DingtalkReqTester) Send(app *App) NotifyRsp    { return r.Config.Notify(app, &r.Data) }
 func (r QcloudSmsReqTester) Send(app *App) NotifyRsp   { return r.Config.Notify(app, &r.Data) }
@@ -144,8 +150,13 @@ func handleRawInternal(app *App, path string, w http.ResponseWriter, r *http.Req
 }
 
 func newTester(configType string) Tester {
-	v := gou.Decode(configType, aliyunsms, &AliyunsmsTester{}, dingtalkrobot, &DingtalkReqTester{},
-		qcloudsms, &QcloudSmsReqTester{}, qcloudvoice, &QcloudSmsVoiceTester{}, qywx, &QywxTester{},
+	v := gou.Decode(configType,
+		aliyunsms, &AliyunsmsTester{},
+		aliyundayusms, &AlidayuTester{},
+		dingtalkrobot, &DingtalkReqTester{},
+		qcloudsms, &QcloudSmsReqTester{},
+		qcloudvoice, &QcloudSmsVoiceTester{},
+		qywx, &QywxTester{},
 		mail, &MailTester{}, sms, &SmsTester{})
 	if v != nil {
 		return v.(Tester)
