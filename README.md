@@ -74,7 +74,7 @@ Response body:
 {
     "config": {
         "accessKeyID": "BvXitpxZTiQPBPJNHzKEyUtZX",
-        "acessKeySecret": "EaouuhLQvkjvBpcqjySEaDtZp",
+        "accessKeySecret": "EaouuhLQvkjvBpcqjySEaDtZp",
         "templateCode": "jHsEdCAyjQiwwKfKTIAyMwhLd",
         "signName": ""
     },
@@ -262,7 +262,7 @@ Request body:
 {
     "config": {
         "accessKeyID": "pGkWHwdlIFPxNbwOuzqqHudVk",
-        "acessKeySecret": "MuIuTxqaaqPFOqNtVZGGxyIVJ",
+        "accessKeySecret": "MuIuTxqaaqPFOqNtVZGGxyIVJ",
         "templateCode": "SMS_11111",
         "signName": "xx编程网"
     },

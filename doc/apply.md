@@ -57,7 +57,7 @@ accessToken|是| 自定义机器人Hook地址中的access_token
 参数 |是否必须 |	说明
 ----|--------|-----
 accessKeyID|是| AccessKeyId用于标识用户。
-acessKeySecret|是| AccessKeySecret是用来验证用户的密钥。AccessKeySecret必须保密。
+accessKeySecret|是| AccessKeySecret是用来验证用户的密钥。AccessKeySecret必须保密。
 TemplateCode|是| 短信模板CODE。
 
 
@@ -71,7 +71,7 @@ TemplateCode|是| 短信模板CODE。
 {
     "config": {
         "accessKeyID": "LTAIaB1FFgE3na",
-        "acessKeySecret": "K4HaHplXvxA1atHfKp0O0M44NdD",
+        "accessKeySecret": "K4HaHplXvxA1atHfKp0O0M44NdD",
         "templateCode": "SMS_138125087",
         "signName": "告警"
     }

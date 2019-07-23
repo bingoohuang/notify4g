@@ -14,7 +14,7 @@ import (
 // AliyunSms 表示阿里云短信发送器
 type AliyunSms struct {
 	AccessKeyID     string `json:"accessKeyID"`
-	AccessKeySecret string `json:"acessKeySecret"`
+	AccessKeySecret string `json:"accessKeySecret"`
 	TemplateCode    string `json:"templateCode"`
 	SignName        string `json:"signName" faker:"-"`
 }
@@ -29,7 +29,7 @@ func (s *AliyunSms) Config(config string) error {
 
 func (s *AliyunSms) InitMeaning() {
 	s.AccessKeyID = "accessKeyID"
-	s.AccessKeySecret = "acessKeySecret"
+	s.AccessKeySecret = "accessKeySecret"
 	s.TemplateCode = "短信模板ID，可以不设置，然后在发送时再设置"
 	s.SignName = "短信模签名，不设置使用默认签名，或者在发送时再设置"
 }
