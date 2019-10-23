@@ -55,7 +55,7 @@ func (s AliyunSms) NewRequest() interface{} { return &AliyunSmsReq{} }
 func (s AliyunSms) ChannelName() string     { return aliyunsms }
 
 // Notify 发送短信
-func (s AliyunSms) Notify(app *App, request interface{}) NotifyRsp {
+func (s AliyunSms) Notify(_ *App, request interface{}) NotifyRsp {
 	req := request.(*AliyunSmsReq)
 	param, outID := s.createParams(req)
 	u, _ := gou.BuildURL("http://dysmsapi.aliyuncs.com/", param)
@@ -91,14 +91,15 @@ func (s AliyunSms) createParams(req *AliyunSmsReq) (map[string]string, string) {
 		"TemplateParam": string(gou.JSON(req.TemplateParams)),
 		"TemplateCode":  gou.EmptyTo(req.TemplateCode, s.TemplateCode),
 		"OutID":         outID}
-
 	str := "" // 3. 构造待签名的字符串
+
 	gou.IterateMapSorted(param, func(k, v string) { str += "&" + enc(k) + "=" + enc(v) })
 
 	toSign := "GET&" + enc("/") + "&" + enc(str[1:])
 	logrus.Debugf("toSign:【%s】", toSign)
 
 	param["Signature"] = gou.HmacSha1(toSign, s.AccessKeySecret+"&") // 4. 签名
+
 	return param, outID
 }
 
@@ -106,5 +107,6 @@ func enc(s string) string {
 	s = url.QueryEscape(s)
 	s = strings.Replace(s, "+", "%20", -1)
 	s = strings.Replace(s, "*", "%2A", -1)
+
 	return strings.Replace(s, "%7E", "~", -1)
 }

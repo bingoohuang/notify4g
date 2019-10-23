@@ -2,8 +2,7 @@ package util
 
 import (
 	"fmt"
-	// pprof debug
-	_ "net/http/pprof"
+	_ "net/http/pprof" // nolint G108
 	"os"
 	"path/filepath"
 	"strings"

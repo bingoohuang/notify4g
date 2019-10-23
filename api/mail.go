@@ -23,6 +23,7 @@ func (q *Mail) Config(config string) error {
 	var port string
 	q.SMTPAddr, port, q.From, q.Username, q.Pass = gou.Split5(config, "/", true, false)
 	q.SMTPPort, _ = strconv.Atoi(port)
+
 	return nil
 }
 
@@ -58,5 +59,6 @@ func (q Mail) Notify(_ *App, request interface{}) NotifyRsp {
 
 	// Notify the email to Bob, Cora and Dan.
 	err := d.DialAndSend(mm)
+
 	return MakeRsp(err, err == nil, q.ChannelName(), nil)
 }

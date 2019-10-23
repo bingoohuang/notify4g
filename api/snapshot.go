@@ -23,6 +23,7 @@ func (s *SnapshotService) InitDefault() error {
 func (s *SnapshotService) Init(dir string) error {
 	var err error
 	s.Dir, err = homedir.Expand(dir)
+
 	if err != nil {
 		return err
 	}
@@ -48,6 +49,7 @@ func (s SnapshotService) Read(file string) ([]byte, error) {
 func (s SnapshotService) Write(file string, content []byte) error {
 	cf := filepath.Join(s.Dir, file)
 	err := ioutil.WriteFile(cf, content, 0644)
+
 	return err
 }
 

@@ -2,7 +2,7 @@ package api
 
 import (
 	"crypto/hmac"
-	"crypto/md5"
+	"crypto/md5" // nolint G501
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -50,12 +50,15 @@ func (client *TopClient) Execute(req AlibabaRequest) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	response, err := http.DefaultClient.PostForm(client.gatewayURL, params)
 	if err != nil {
 		return "", err
 	}
 
+	defer response.Body.Close()
 	body, err := ioutil.ReadAll(response.Body)
+
 	if err != nil {
 		return "", err
 	}
@@ -67,6 +70,7 @@ func (client *TopClient) buildParams(req AlibabaRequest) (url.Values, error) {
 	if err := req.ParamsIsValid(); err != nil {
 		return nil, err
 	}
+
 	if len(req.GetMethodName()) == 0 {
 		return nil, errors.New("method is required")
 	}
@@ -104,9 +108,11 @@ func (client *TopClient) buildParams(req AlibabaRequest) (url.Values, error) {
 	paramsCommon["sign"] = client.sign(reqParams, paramsCommon)
 
 	params := make(url.Values)
+
 	for key, value := range reqParams {
 		params.Set(key, value)
 	}
+
 	for key, value := range paramsCommon {
 		params.Set(key, value)
 	}
@@ -121,6 +127,7 @@ func (client *TopClient) timestamp() string {
 func (client *TopClient) sign(reqParams, paramsCommon map[string]string) string {
 	ks := make([]string, 0)
 	params := make(map[string]string)
+
 	for key, value := range reqParams {
 		ks = append(ks, key)
 		params[key] = value
@@ -130,24 +137,30 @@ func (client *TopClient) sign(reqParams, paramsCommon map[string]string) string 
 		ks = append(ks, key)
 		params[key] = value
 	}
+
 	sort.Strings(ks)
+
 	str := ""
+
 	for _, k := range ks {
 		str += k + params[k]
 	}
 
 	sign := HmacMD5(client.secretKey, str)
+
 	return strings.ToUpper(sign)
 }
 
 func HmacMD5(key, data string) string {
 	h := hmac.New(md5.New, []byte(key))
+
 	_, err := h.Write([]byte(data))
 	if err != nil {
 		return ""
 	}
 
 	hash := h.Sum([]byte(""))
+
 	return fmt.Sprintf("%x", hash)
 }
 
@@ -182,6 +195,7 @@ type AlibabaAliqinFcSmsNumSendRequest struct {
 func NewAlibabaAliqinFcSmsNumSendRequest() *AlibabaAliqinFcSmsNumSendRequest {
 	req := new(AlibabaAliqinFcSmsNumSendRequest)
 	req.SmsType = "normal"
+
 	return req
 }
 
@@ -193,14 +207,18 @@ func (req *AlibabaAliqinFcSmsNumSendRequest) ParamsIsValid() error {
 	if len(req.SmsType) == 0 {
 		return errors.New("sms_type is required")
 	}
+
 	if len(req.SmsFreeSignName) == 0 {
 		return errors.New("sms_free_sign_name is required")
 	}
+
 	if len(req.RecNum) == 0 {
 		return errors.New("rec_num is required")
 	}
+
 	if len(req.SmsTemplateCode) == 0 {
 		return errors.New("sms_template_code is required")
 	}
+
 	return nil
 }

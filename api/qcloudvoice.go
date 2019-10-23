@@ -100,6 +100,7 @@ func (s QcloudVoice) Notify(app *App, request interface{}) NotifyRsp {
 
 func (s QcloudVoice) ConvertRequest(r map[string]string) []string {
 	params := make([]string, len(s.TmplVarNames))
+
 	for i, k := range s.TmplVarNames {
 		if v, ok := r[k]; ok {
 			params[i] = v

@@ -24,8 +24,8 @@ var _ Config = (*QcloudSms)(nil)
 
 // Config 加载配置
 func (q *QcloudSms) Config(config string) error {
-	var tplID string
-	var varNames string
+	var tplID, varNames string
+
 	q.Sdkappid, q.Appkey, tplID, q.Sign, varNames = gou.Split5(config, "/", true, false)
 	q.TplID, _ = strconv.Atoi(tplID)
 	q.TmplVarNames = strings.SplitN(varNames, "-", -1)
@@ -118,6 +118,7 @@ var _ SmsNotifier = (*QcloudSms)(nil)
 
 func (q QcloudSms) ConvertRequest(r *SmsReq) interface{} {
 	params := make([]string, len(q.TmplVarNames))
+
 	for i, k := range q.TmplVarNames {
 		if v, ok := r.TemplateParams[k]; ok {
 			params[i] = v

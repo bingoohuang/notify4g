@@ -17,6 +17,7 @@ func InitCtl(sfs *fs.StatiqFS, ctlTplName, ctlFilename string) error {
 	if err != nil {
 		return err
 	}
+
 	if exists == Exists {
 		fmt.Println(ctlFilename + " already exists, ignored!")
 		return nil
@@ -24,6 +25,7 @@ func InitCtl(sfs *fs.StatiqFS, ctlTplName, ctlFilename string) error {
 
 	ctl := string(sfs.Files[ctlTplName].Data)
 	tpl, err := template.New(ctlTplName).Parse(ctl)
+
 	if err != nil {
 		return err
 	}
@@ -31,7 +33,9 @@ func InitCtl(sfs *fs.StatiqFS, ctlTplName, ctlFilename string) error {
 	binArgs := argsExcludeInit()
 
 	var content bytes.Buffer
+
 	m := map[string]string{"BinName": os.Args[0], "BinArgs": strings.Join(binArgs, " ")}
+
 	if err := tpl.Execute(&content, m); err != nil {
 		return err
 	}
@@ -42,15 +46,18 @@ func InitCtl(sfs *fs.StatiqFS, ctlTplName, ctlFilename string) error {
 	}
 
 	fmt.Println(ctlFilename + " created!")
+
 	return nil
 }
 
 func argsExcludeInit() []string {
 	binArgs := make([]string, 0, len(os.Args)-2)
+
 	for i, arg := range os.Args {
 		if i == 0 {
 			continue
 		}
+
 		if strings.Index(arg, "-i") == 0 || strings.Index(arg, "--init") == 0 {
 			continue
 		}

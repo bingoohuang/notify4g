@@ -38,6 +38,7 @@ func (s Dingtalk) Notify(app *App, request interface{}) NotifyRsp {
 	req := request.(*DingtalkReq)
 	robot := Robot{Webhook: "https://oapi.dingtalk.com/robot/send?access_token=" + s.AccessToken}
 	rsp, err := robot.SendText(req.Message, req.AtMobiles, req.AtAll)
+
 	return MakeRsp(err, rsp.Errcode == 0, s.ChannelName(), rsp)
 }
 
@@ -100,6 +101,7 @@ type DingResponse struct {
 func (r Robot) send(msg interface{}) (DingResponse, error) {
 	var dr DingResponse
 	_, err := gou.RestPost(r.Webhook, msg, &dr)
+
 	if err != nil {
 		return dr, err
 	}

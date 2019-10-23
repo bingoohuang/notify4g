@@ -33,7 +33,9 @@ func (t *NotifyConfigCache) Write(k string, v *NotifyConfig, writeCache bool) er
 	t.C.SetDefault(k, v)
 
 	var bytes []byte
+
 	var err error
+
 	if bytes, err = json.Marshal(v); err != nil {
 		return err
 	}
@@ -58,6 +60,7 @@ func (t *NotifyConfigCache) Read(key string) *NotifyConfig {
 			if err := t.Write(key, c, false); err != nil {
 				logrus.Warnf("write snapshot failed %v", err)
 			}
+
 			return c
 		}
 	}
@@ -67,10 +70,10 @@ func (t *NotifyConfigCache) Read(key string) *NotifyConfig {
 
 func (t *NotifyConfigCache) Delete(key string) {
 	t.C.Delete(key)
+
 	if err := t.Snapshot.Delete(key + ".json"); err != nil {
 		logrus.Warnf("delete snapshot failed %v", err)
 	}
-
 }
 
 func (t *NotifyConfigCache) Walk(fn func(k string, v *NotifyConfig)) {

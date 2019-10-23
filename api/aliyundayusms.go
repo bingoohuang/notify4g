@@ -79,5 +79,6 @@ func (s AliyunDaYuSms) createParams(r *AliyunDaYuSmsReq) *AlibabaAliqinFcSmsNumS
 	req.RecNum = strings.Join(r.Mobiles, ",")
 	req.SmsTemplateCode = gou.EmptyTo(r.TemplateCode, s.TemplateCode)
 	req.SmsParam = string(gou.JSON(r.TemplateParams))
+
 	return req
 }

@@ -75,6 +75,7 @@ func NewConfig(typ string) (Config, error) {
 	if v != nil {
 		return v.(Config), nil
 	}
+
 	return nil, errors.New("unknown config type " + typ)
 }
 
@@ -106,6 +107,7 @@ func (a *App) prepareNotify(w http.ResponseWriter, configID string) error {
 
 	req := c.Config.NewRequest()
 	_ = faker.Fake(req)
+
 	return WriteJSON(w, req)
 }
 
@@ -121,6 +123,7 @@ func (a *App) postNotify(w http.ResponseWriter, r *http.Request, configID string
 	}
 
 	rsp := a.NotifyByConfigID(configID, req)
+
 	return WriteJSON(w, rsp)
 }
 
@@ -130,8 +133,7 @@ func (a *App) NotifyByConfigID(configID string, req interface{}) NotifyRsp {
 		return MakeRsp(fmt.Errorf("configID %s not found", configID), false, "", nil)
 	}
 
-	rsp := c.Config.Notify(a, req)
-	return rsp
+	return c.Config.Notify(a, req)
 }
 
 func (a *App) ServeByConfig(path string) func(w http.ResponseWriter, r *http.Request) {
@@ -164,6 +166,7 @@ func (a *App) DeleteConfig(w http.ResponseWriter, l int, subs []string) error {
 	}
 
 	a.configCache.Delete(subs[0])
+
 	return WriteJSON(w, Rsp{Status: 200, Message: "OK"})
 }
 
@@ -174,12 +177,14 @@ func (a *App) PostConfig(w http.ResponseWriter, r *http.Request, l int, subs []s
 
 	content := gou.ReadObjectBytes(r.Body)
 	config, err := ParseNotifyConfig(content)
+
 	if err != nil {
 		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: err.Error()})
 	}
 
 	configID := subs[0]
 	_ = a.configCache.Write(configID, config, true)
+
 	return WriteJSON(w, Rsp{Status: 200, Message: "OK"})
 }
 
@@ -187,7 +192,9 @@ func (a *App) GetConfig(w http.ResponseWriter, l int, subs []string) error {
 	if l != 1 && l != 2 {
 		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: "invalid path"})
 	}
+
 	configID := subs[0]
+
 	if l == 2 {
 		config, err := NewConfig(subs[1])
 		if err != nil {
@@ -195,6 +202,7 @@ func (a *App) GetConfig(w http.ResponseWriter, l int, subs []string) error {
 		}
 
 		config.InitMeaning()
+
 		return WriteJSON(w, NotifyConfig{Type: subs[1], Config: config})
 	}
 
@@ -208,10 +216,12 @@ func (a *App) GetConfig(w http.ResponseWriter, l int, subs []string) error {
 
 func WriteErrorJSON(statusCode int, w http.ResponseWriter, v interface{}) error {
 	w.WriteHeader(statusCode)
+
 	return WriteJSON(w, v)
 }
 
 func WriteJSON(w http.ResponseWriter, v interface{}) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
 	return json.NewEncoder(w).Encode(v)
 }

@@ -52,6 +52,7 @@ func HandleHome(app *App, homeTemplate string) func(w http.ResponseWriter, r *ht
 
 func findConfigIDs(m *gou.MultiMap, configType string) []string {
 	arr := make([]string, 0)
+
 	if v, ok := m.Get(configType); ok {
 		for _, i := range v {
 			arr = append(arr, i.(string))
@@ -59,6 +60,7 @@ func findConfigIDs(m *gou.MultiMap, configType string) []string {
 	}
 
 	sort.Strings(arr)
+
 	return arr
 }
 
@@ -129,6 +131,7 @@ func handleRawInternal(app *App, path string, w http.ResponseWriter, r *http.Req
 
 	configType := subs[0]
 	tester := newTester(configType)
+
 	if tester == nil {
 		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: "invalid type " + configType})
 	}
@@ -136,6 +139,7 @@ func handleRawInternal(app *App, path string, w http.ResponseWriter, r *http.Req
 	switch r.Method {
 	case GET:
 		_ = faker.Fake(tester)
+
 		return WriteJSON(w, tester)
 	case POST:
 		if err := json.NewDecoder(r.Body).Decode(tester); err != nil {
@@ -143,6 +147,7 @@ func handleRawInternal(app *App, path string, w http.ResponseWriter, r *http.Req
 		}
 
 		rsp := tester.Send(app)
+
 		return WriteJSON(w, rsp)
 	default:
 		return WriteErrorJSON(404, w, Rsp{Status: 404, Message: "Not Found"})

@@ -48,10 +48,11 @@ func (r Sms) Notify(app *App, request interface{}) NotifyRsp {
 	retry := 0
 	maxRetry := r.maxRetryTimes(req)
 
-	var rsp NotifyRsp
 	var err error
-	var succ bool
-	var channelName string
+
+	succ := false
+	channelName := ""
+	rsp := NotifyRsp{}
 
 	f := func(configID string) bool {
 		nc := app.configCache.Read(configID)
@@ -61,7 +62,9 @@ func (r Sms) Notify(app *App, request interface{}) NotifyRsp {
 		}
 
 		var smsNotifier SmsNotifier
-		var ok bool
+
+		ok := false
+
 		if smsNotifier, ok = nc.Config.(SmsNotifier); !ok {
 			err = fmt.Errorf("configID %s not a SmsNotifier config", configID)
 			return BreakIterating
@@ -70,6 +73,7 @@ func (r Sms) Notify(app *App, request interface{}) NotifyRsp {
 		channelName = nc.Config.ChannelName()
 		r := smsNotifier.ConvertRequest(req)
 		rsp = nc.Config.Notify(app, r)
+
 		if rsp.Status == 200 {
 			succ = true
 			return BreakIterating
@@ -84,6 +88,7 @@ func (r Sms) Notify(app *App, request interface{}) NotifyRsp {
 	}
 
 	gou.IterateSlice(r.ConfigIds, r.startIndex(), f)
+
 	return MakeRsp(err, succ, channelName, rsp)
 }
 
@@ -92,6 +97,7 @@ func (r Sms) maxRetryTimes(req *SmsReq) int {
 	if retryTimes < 0 {
 		retryTimes = r.Retry
 	}
+
 	return retryTimes
 }
 
@@ -99,5 +105,6 @@ func (r Sms) startIndex() int {
 	if r.Random {
 		return gou.RandomIntN(uint64(len(r.ConfigIds)))
 	}
+
 	return 0
 }

@@ -29,7 +29,9 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(sfs)))
 
 	logrus.SetLevel(logrus.InfoLevel)
+
 	addr := viper.GetString("addr")
+
 	logrus.Infof("start to listen and serve on address %s", addr)
 	logrus.Fatal(http.ListenAndServe(addr, nil))
 }

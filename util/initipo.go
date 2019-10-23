@@ -15,6 +15,7 @@ func Ipo(ipo bool) {
 	if err := ipoInit(); err != nil {
 		fmt.Println(err)
 	}
+
 	os.Exit(0)
 }
 

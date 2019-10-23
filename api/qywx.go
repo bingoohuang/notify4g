@@ -22,6 +22,7 @@ func GetQywxAccessToken(corpID, corpSecret string) (string, error) {
 	logrus.Debugf("url:%s", url)
 	resp, err := gou.UrlGet(url)
 	logrus.Debugf("resp:%+v, err:%+v", resp, err)
+
 	if err != nil {
 		return "", err
 	}
@@ -45,8 +46,10 @@ func SendQywxMsg(accessToken, agentID, content string, userIds []string) (QywxRs
 	msg := map[string]interface{}{
 		"touser": touser, "msgtype": "text", "agentid": agentID, "safe": 0,
 		"text": map[string]string{"content": content}}
+
 	var rsp QywxRsp
 	_, err := gou.RestPost("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token="+accessToken, msg, &rsp)
+
 	return rsp, err
 }
 
