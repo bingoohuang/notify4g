@@ -31,18 +31,24 @@ type SmsReq struct {
 	Retry          int               `json:"retry" faker:"-"` // 在发送配置中，重试n次, -1表示使用默认配置
 }
 
-func (r Sms) NewRequest() interface{} { return &SmsReq{} }
-func (r Sms) ChannelName() string     { return sms }
+func (q *SmsReq) FilterRedList(list redList) bool {
+	q.Mobiles = list.FilterMobiles(q.Mobiles)
+
+	return len(q.Mobiles) > 0
+}
+
+func (r Sms) NewRequest() Request { return &SmsReq{} }
+func (r Sms) ChannelName() string { return sms }
 
 type SmsNotifier interface {
-	ConvertRequest(*SmsReq) interface{}
+	ConvertRequest(*SmsReq) Request
 }
 
 const BreakIterating = true
 const ContinueIterating = false
 
 // Notify 发送短信
-func (r Sms) Notify(app *App, request interface{}) NotifyRsp {
+func (r Sms) Notify(app *App, request Request) NotifyRsp {
 	req := request.(*SmsReq)
 
 	retry := 0

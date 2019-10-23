@@ -11,12 +11,21 @@ import (
 	"github.com/pkg/errors"
 )
 
+type RedListFilter interface {
+	// FilterRedList 过滤，返回true表示还有剩余项目
+	FilterRedList(list redList) bool
+}
+
+type Request interface {
+	RedListFilter
+}
+
 type Config interface {
 	Config(config string) error
-	Notify(app *App, req interface{}) NotifyRsp
+	Notify(app *App, req Request) NotifyRsp
 	ChannelName() string
 	InitMeaning()
-	NewRequest() interface{}
+	NewRequest() Request
 }
 
 type App struct {
@@ -127,10 +136,15 @@ func (a *App) postNotify(w http.ResponseWriter, r *http.Request, configID string
 	return WriteJSON(w, rsp)
 }
 
-func (a *App) NotifyByConfigID(configID string, req interface{}) NotifyRsp {
+func (a *App) NotifyByConfigID(configID string, req Request) NotifyRsp {
 	c := a.configCache.Read(configID)
 	if c == nil {
 		return MakeRsp(fmt.Errorf("configID %s not found", configID), false, "", nil)
+	}
+
+	list := a.configCache.ReadRedList()
+	if !req.FilterRedList(list.prepare()) {
+		return MakeRsp(errors.Errorf("target is empty after redlist filtered"), false, "NA", nil)
 	}
 
 	return c.Config.Notify(a, req)

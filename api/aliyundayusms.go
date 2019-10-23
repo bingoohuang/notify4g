@@ -38,6 +38,12 @@ type AliyunDaYuSmsReq struct {
 	Mobiles        []string          `json:"mobiles" faker:"china_mobile_number"`
 }
 
+func (a *AliyunDaYuSmsReq) FilterRedList(list redList) bool {
+	a.Mobiles = list.FilterMobiles(a.Mobiles)
+
+	return len(a.Mobiles) > 0
+}
+
 type AliyunDaYuSmsRsp struct {
 	Response map[string]interface{} `json:"alibaba_aliqin_fc_sms_num_send_response"`
 	AliyunDaYuSmsErrorRsp
@@ -50,11 +56,11 @@ type AliyunDaYuSmsErrorRsp struct {
 	Msg     string `json:"msg"`
 }
 
-func (s AliyunDaYuSms) NewRequest() interface{} { return &AliyunDaYuSmsReq{} }
-func (s AliyunDaYuSms) ChannelName() string     { return aliyundayusms }
+func (s AliyunDaYuSms) NewRequest() Request { return &AliyunDaYuSmsReq{} }
+func (s AliyunDaYuSms) ChannelName() string { return aliyundayusms }
 
 // Notify 发送短信 https://api.alidayu.com/doc2/apiDetail?apiId=25450
-func (s AliyunDaYuSms) Notify(app *App, request interface{}) NotifyRsp {
+func (s AliyunDaYuSms) Notify(_ *App, request Request) NotifyRsp {
 	req := request.(*AliyunDaYuSmsReq)
 	client := NewTopClient(s.AppKey, s.AppSecret)
 	param := s.createParams(req)
@@ -69,7 +75,7 @@ func (s AliyunDaYuSms) Notify(app *App, request interface{}) NotifyRsp {
 
 var _ SmsNotifier = (*AliyunDaYuSms)(nil)
 
-func (s AliyunDaYuSms) ConvertRequest(r *SmsReq) interface{} {
+func (s AliyunDaYuSms) ConvertRequest(r *SmsReq) Request {
 	return &AliyunDaYuSmsReq{TemplateParams: r.TemplateParams, Mobiles: r.Mobiles}
 }
 

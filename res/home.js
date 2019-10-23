@@ -5,8 +5,36 @@ $(function () {
     const rspEditor = CodeMirror.fromTextArea(document.getElementById("rspEditor"), {
         mode: 'application/json', lineNumbers: true
     });
+
+    const redlistEditor = CodeMirror.fromTextArea(document.getElementById("redlistEditor"), {
+        mode: 'application/json', lineNumbers: true
+    });
+
     reqEditor.setValue('{}');
     rspEditor.setValue('{}');
+    redlistEditor.setValue('{}');
+
+    $.ajax({
+        type: 'GET',
+        url: '/redlist',
+        success: function (content) {
+            redlistEditor.setValue(JSON.stringify(content, null, 4))
+        },
+        error: ajaxError
+    })
+
+    $('#btnPostRedlist').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '/redlist',
+            processData: false,
+            data: redlistEditor.getValue(),
+            success: function (content) {
+            },
+            error: ajaxError
+        })
+    })
+
 
     let lastRow = null;
 

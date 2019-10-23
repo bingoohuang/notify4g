@@ -90,6 +90,12 @@ type QywxReq struct {
 	UserIds []string `json:"userIds"`
 }
 
+func (q *QywxReq) FilterRedList(list redList) bool {
+	q.UserIds = list.FilterQywxUserIds(q.UserIds)
+
+	return len(q.UserIds) > 0
+}
+
 type QywxRsp struct {
 	Errocode     int    `json:"errcode"`
 	Errmsg       string `json:"errmsg"`
@@ -98,11 +104,11 @@ type QywxRsp struct {
 	Invalidtag   string `json:"invalidtag"`
 }
 
-func (s Qywx) NewRequest() interface{} { return &QywxReq{} }
-func (s Qywx) ChannelName() string     { return qywx }
+func (s Qywx) NewRequest() Request { return &QywxReq{} }
+func (s Qywx) ChannelName() string { return qywx }
 
 // Notify 发送企业消息
-func (s Qywx) Notify(app *App, request interface{}) NotifyRsp {
+func (s Qywx) Notify(app *App, request Request) NotifyRsp {
 	r := request.(*QywxReq)
 	rsp, err := FastSendQywxMsg(s.CorpID, s.CorpSecret, s.AgentID, r.Msg, r.UserIds)
 

@@ -5,17 +5,22 @@ notify api for sms/voice/qywx/mail/dingtalk
 
 for release:
 
-1. `./build.sh` for local
-1. `./build.sh -t linux` for linux version
+1. `./gb.py` for local
+1. `./gb.py -t linux` for linux version
  
 ```bash
-$ ./build.sh -h
-Usage: ./build.sh [OPTION]...
-
-  -t target   linux/local, default local
-  -u yes/no   enable upx compression if upx is available or not
-  -b          binary name, default notify4g
-  -h          display help
+$ ./gb.py -h
+  usage: gb.py [-h] [-t {linux,local}] [-u] [-b BINARY]
+  
+  building go
+  
+  optional arguments:
+    -h, --help            show this help message and exit
+    -t {linux,local}, --target {linux,local}
+                          target OS, default local
+    -u, --upx             enable upx compression if it is available
+    -b BINARY, --binary BINARY
+                          binary name, default base of current dir
 ```
 
 for dev:

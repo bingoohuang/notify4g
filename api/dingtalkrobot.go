@@ -24,8 +24,8 @@ func (s *Dingtalk) InitMeaning() {
 	s.AccessToken = "自定义机器人的accessToken"
 }
 
-func (s Dingtalk) ChannelName() string     { return dingtalkrobot }
-func (s Dingtalk) NewRequest() interface{} { return &DingtalkReq{} }
+func (s Dingtalk) ChannelName() string { return dingtalkrobot }
+func (s Dingtalk) NewRequest() Request { return &DingtalkReq{} }
 
 type DingtalkReq struct {
 	Message   string   `json:"message"`
@@ -33,8 +33,14 @@ type DingtalkReq struct {
 	AtAll     bool     `json:"atAll"`
 }
 
+func (s *DingtalkReq) FilterRedList(list redList) bool {
+	s.AtMobiles = list.FilterMobiles(s.AtMobiles)
+
+	return len(s.AtMobiles) > 0
+}
+
 // Notify 发送信息
-func (s Dingtalk) Notify(app *App, request interface{}) NotifyRsp {
+func (s Dingtalk) Notify(app *App, request Request) NotifyRsp {
 	req := request.(*DingtalkReq)
 	robot := Robot{Webhook: "https://oapi.dingtalk.com/robot/send?access_token=" + s.AccessToken}
 	rsp, err := robot.SendText(req.Message, req.AtMobiles, req.AtAll)

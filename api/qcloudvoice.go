@@ -44,6 +44,18 @@ type QcloudVoiceReq struct {
 	Mobile string            `json:"mobile" faker:"china_mobile_number"`
 }
 
+func (q *QcloudVoiceReq) FilterRedList(list redList) bool {
+	mobiles := list.FilterMobiles([]string{q.Mobile})
+	if len(mobiles) > 0 {
+		q.Mobile = mobiles[0]
+		return true
+	}
+
+	q.Mobile = ""
+
+	return false
+}
+
 type RawQcloudVoiceRsp struct {
 	Result int    `json:"result"`
 	Errmsg string `json:"errmsg"`
@@ -63,15 +75,15 @@ type RawQcloudVoiceReq struct {
 	Ext  string `json:"ext"`  // 用户的 session 内容，腾讯 server 回包中会原样返回，可选字段，不需要就填空
 }
 
-func (s QcloudVoice) NewRequest() interface{} { return &QcloudVoiceReq{} }
-func (s QcloudVoice) ChannelName() string     { return qcloudvoice }
+func (s QcloudVoice) NewRequest() Request { return &QcloudVoiceReq{} }
+func (s QcloudVoice) ChannelName() string { return qcloudvoice }
 
 // 语音短信模板ID：326476   应用:{1} 监控埋点:{2} 在近{3}分钟内发生{4}, 其中最高{5}, 最低{6}
 // 示例：应用:logcenter-flume 监控埋点:events成功写入kafka的数量#mssp_server_sink#192_168_22_1
 // 在近10分钟内发生连续7次请求次数等于0.0, 其中最高2300.0, 最低1800.0
 
 // Notify 发送信息
-func (s QcloudVoice) Notify(app *App, request interface{}) NotifyRsp {
+func (s QcloudVoice) Notify(_ *App, request Request) NotifyRsp {
 	r := request.(*QcloudVoiceReq)
 
 	rando := gou.RandomIntAsString()

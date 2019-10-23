@@ -22,6 +22,7 @@ func main() {
 
 	http.HandleFunc("/", auth(api.HandleHome(app, string(sfs.Files["/home.html"].Data))))
 	http.HandleFunc("/raw/", api.HandleRaw(app, "/raw/"))
+	http.HandleFunc("/redlist", api.HandleRedlist(app)) // 红名单的读取和设置
 
 	http.HandleFunc("/config/", app.ServeByConfig("/config/"))
 	http.HandleFunc("/notify/", app.NotifyByConfig("/notify/"))

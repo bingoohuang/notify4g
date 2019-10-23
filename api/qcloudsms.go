@@ -79,8 +79,14 @@ type QcloudSmsReq struct {
 	Mobiles []string `json:"mobiles" faker:"china_mobile_number"`
 }
 
-func (q QcloudSms) ChannelName() string     { return qcloudsms }
-func (q QcloudSms) NewRequest() interface{} { return &QcloudSmsReq{} }
+func (q *QcloudSmsReq) FilterRedList(list redList) bool {
+	q.Mobiles = list.FilterMobiles(q.Mobiles)
+
+	return len(q.Mobiles) > 0
+}
+
+func (q QcloudSms) ChannelName() string { return qcloudsms }
+func (q QcloudSms) NewRequest() Request { return &QcloudSmsReq{} }
 
 // 目前业务埋点监控告警模板如下:
 // 短信模板ID：157749   应用:{1} 监控埋点:{2} 在近{3}分钟内发生{4}, 其中最高{5}, 最低{6}
@@ -89,7 +95,7 @@ func (q QcloudSms) NewRequest() interface{} { return &QcloudSmsReq{} }
 // 模板 157749 参数列表 ["appName", "key","minutes","counts","max","min"]
 
 // Notify 发送信息
-func (q QcloudSms) Notify(app *App, request interface{}) NotifyRsp {
+func (q QcloudSms) Notify(app *App, request Request) NotifyRsp {
 	r := request.(*QcloudSmsReq)
 
 	rando := gou.RandomIntAsString()
@@ -116,7 +122,7 @@ func (q QcloudSms) Notify(app *App, request interface{}) NotifyRsp {
 
 var _ SmsNotifier = (*QcloudSms)(nil)
 
-func (q QcloudSms) ConvertRequest(r *SmsReq) interface{} {
+func (q QcloudSms) ConvertRequest(r *SmsReq) Request {
 	params := make([]string, len(q.TmplVarNames))
 
 	for i, k := range q.TmplVarNames {

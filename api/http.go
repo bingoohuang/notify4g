@@ -65,6 +65,8 @@ func findConfigIDs(m *gou.MultiMap, configType string) []string {
 }
 
 type Tester interface {
+	RedListFilter
+
 	Send(*App) NotifyRsp
 }
 
@@ -73,40 +75,65 @@ type AliyunsmsTester struct {
 	Data   AliyunSmsReq `json:"data"`
 }
 
+var _ Tester = (*AliyunsmsTester)(nil)
+
 type AlidayuTester struct {
 	Config AliyunDaYuSms    `json:"config"`
 	Data   AliyunDaYuSmsReq `json:"data"`
 }
+
+var _ Tester = (*AlidayuTester)(nil)
 
 type DingtalkReqTester struct {
 	Config Dingtalk    `json:"config"`
 	Data   DingtalkReq `json:"data"`
 }
 
+var _ Tester = (*DingtalkReqTester)(nil)
+
 type QcloudSmsReqTester struct {
 	Config QcloudSms    `json:"config"`
 	Data   QcloudSmsReq `json:"data"`
 }
+
+var _ Tester = (*QcloudSmsReqTester)(nil)
 
 type QcloudSmsVoiceTester struct {
 	Config QcloudVoice    `json:"config"`
 	Data   QcloudVoiceReq `json:"data"`
 }
 
+var _ Tester = (*QcloudSmsVoiceTester)(nil)
+
 type QywxTester struct {
 	Config Qywx    `json:"config"`
 	Data   QywxReq `json:"data"`
 }
+
+var _ Tester = (*QywxTester)(nil)
 
 type MailTester struct {
 	Config Mail    `json:"config"`
 	Data   MailReq `json:"data"`
 }
 
+var _ Tester = (*MailTester)(nil)
+
 type SmsTester struct {
 	Config Sms    `json:"config"`
 	Data   SmsReq `json:"data"`
 }
+
+var _ Tester = (*SmsTester)(nil)
+
+func (r AlidayuTester) FilterRedList(list redList) bool        { return r.Data.FilterRedList(list) }
+func (r AliyunsmsTester) FilterRedList(list redList) bool      { return r.Data.FilterRedList(list) }
+func (r DingtalkReqTester) FilterRedList(list redList) bool    { return r.Data.FilterRedList(list) }
+func (r QcloudSmsReqTester) FilterRedList(list redList) bool   { return r.Data.FilterRedList(list) }
+func (r QcloudSmsVoiceTester) FilterRedList(list redList) bool { return r.Data.FilterRedList(list) }
+func (r QywxTester) FilterRedList(list redList) bool           { return r.Data.FilterRedList(list) }
+func (r MailTester) FilterRedList(list redList) bool           { return r.Data.FilterRedList(list) }
+func (r SmsTester) FilterRedList(list redList) bool            { return r.Data.FilterRedList(list) }
 
 func (r AlidayuTester) Send(app *App) NotifyRsp        { return r.Config.Notify(app, &r.Data) }
 func (r AliyunsmsTester) Send(app *App) NotifyRsp      { return r.Config.Notify(app, &r.Data) }
@@ -116,6 +143,26 @@ func (r QcloudSmsVoiceTester) Send(app *App) NotifyRsp { return r.Config.Notify(
 func (r QywxTester) Send(app *App) NotifyRsp           { return r.Config.Notify(app, &r.Data) }
 func (r MailTester) Send(app *App) NotifyRsp           { return r.Config.Notify(app, &r.Data) }
 func (r SmsTester) Send(app *App) NotifyRsp            { return r.Config.Notify(app, &r.Data) }
+
+func HandleRedlist(a *App) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case GET:
+			list := a.configCache.ReadRedList()
+			_ = WriteJSON(w, list)
+		case POST:
+			var list RedList
+			if err := json.NewDecoder(r.Body).Decode(&list); err != nil {
+				_ = WriteErrorJSON(400, w, Rsp{Status: 400, Message: err.Error()})
+			} else {
+				_ = a.configCache.WriteRedList(list, true)
+				_ = WriteJSON(w, Rsp{Status: 200, Message: "OK"})
+			}
+		default:
+			_ = WriteErrorJSON(404, w, Rsp{Status: 404, Message: "Not Found"})
+		}
+	}
+}
 
 func HandleRaw(app *App, path string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -130,7 +177,7 @@ func handleRawInternal(app *App, path string, w http.ResponseWriter, r *http.Req
 	}
 
 	configType := subs[0]
-	tester := newTester(configType)
+	tester := newTester(app, configType)
 
 	if tester == nil {
 		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: "invalid type " + configType})
@@ -154,17 +201,21 @@ func handleRawInternal(app *App, path string, w http.ResponseWriter, r *http.Req
 	}
 }
 
-func newTester(configType string) Tester {
-	v := gou.Decode(configType,
+func newTester(a *App, configType string) Tester {
+	if v := gou.Decode(configType,
 		aliyunsms, &AliyunsmsTester{},
 		aliyundayusms, &AlidayuTester{},
 		dingtalkrobot, &DingtalkReqTester{},
 		qcloudsms, &QcloudSmsReqTester{},
 		qcloudvoice, &QcloudSmsVoiceTester{},
 		qywx, &QywxTester{},
-		mail, &MailTester{}, sms, &SmsTester{})
-	if v != nil {
-		return v.(Tester)
+		mail, &MailTester{}, sms, &SmsTester{}); v != nil {
+		tester := v.(Tester)
+		list := a.configCache.ReadRedList()
+
+		if tester.FilterRedList(list.prepare()) {
+			return tester
+		}
 	}
 
 	return nil

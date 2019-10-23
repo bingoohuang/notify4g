@@ -41,11 +41,17 @@ type MailReq struct {
 	To      []string `json:"to" faker:"email"`
 }
 
-func (q Mail) NewRequest() interface{} { return &MailReq{} }
-func (q Mail) ChannelName() string     { return mail }
+func (m *MailReq) FilterRedList(list redList) bool {
+	m.To = list.FilterMails(m.To)
+
+	return len(m.To) > 0
+}
+
+func (q Mail) NewRequest() Request { return &MailReq{} }
+func (q Mail) ChannelName() string { return mail }
 
 // Notify 发送邮件
-func (q Mail) Notify(_ *App, request interface{}) NotifyRsp {
+func (q Mail) Notify(_ *App, request Request) NotifyRsp {
 	r := request.(*MailReq)
 
 	mm := gomail.NewMessage()

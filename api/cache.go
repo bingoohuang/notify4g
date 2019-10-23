@@ -29,7 +29,7 @@ func NewCache(snapshotDir string) *NotifyConfigCache {
 	return c
 }
 
-func (t *NotifyConfigCache) Write(k string, v *NotifyConfig, writeCache bool) error {
+func (t *NotifyConfigCache) write(k string, v interface{}, writeSnapshot bool) error {
 	t.C.SetDefault(k, v)
 
 	var bytes []byte
@@ -40,11 +40,46 @@ func (t *NotifyConfigCache) Write(k string, v *NotifyConfig, writeCache bool) er
 		return err
 	}
 
-	if writeCache {
+	if writeSnapshot {
 		return t.Snapshot.Write(k+".json", bytes)
 	}
 
 	return nil
+}
+
+func (t *NotifyConfigCache) Write(k string, v *NotifyConfig, writeSnapshot bool) error {
+	return t.write(k, v, writeSnapshot)
+}
+
+const redlistKey = "_redlist_"
+
+func (t *NotifyConfigCache) WriteRedList(v RedList, writeSnapshot bool) error {
+	return t.write(redlistKey, v, writeSnapshot)
+}
+
+func (t *NotifyConfigCache) ReadRedList() (redlist RedList) {
+	key := redlistKey
+	v, found := t.C.Get(key)
+
+	if found {
+		return v.(RedList)
+	}
+
+	content, _ := t.Snapshot.Read(key + ".json")
+	if len(content) == 0 {
+		return redlist
+	}
+
+	if err := json.Unmarshal(content, &redlist); err != nil {
+		logrus.Warnf("json Unmarshal failed %v", err)
+		return redlist
+	}
+
+	if err := t.WriteRedList(redlist, false); err != nil {
+		logrus.Warnf("write snapshot failed %v", err)
+	}
+
+	return redlist
 }
 
 func (t *NotifyConfigCache) Read(key string) *NotifyConfig {
@@ -82,7 +117,9 @@ func (t *NotifyConfigCache) Walk(fn func(k string, v *NotifyConfig)) {
 
 	for _, ki := range keys {
 		vi := items[ki]
-		fn(ki, vi.Object.(*NotifyConfig))
+		if config, ok := vi.Object.(*NotifyConfig); ok {
+			fn(ki, config)
+		}
 	}
 }
 

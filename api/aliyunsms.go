@@ -41,6 +41,12 @@ type AliyunSmsReq struct {
 	Mobiles        []string          `json:"mobiles" faker:"china_mobile_number"`
 }
 
+func (a *AliyunSmsReq) FilterRedList(list redList) bool {
+	a.Mobiles = list.FilterMobiles(a.Mobiles)
+
+	return len(a.Mobiles) > 0
+}
+
 type AliyunSmsRsp struct {
 	OutID string `json:"outId"`
 
@@ -51,11 +57,11 @@ type AliyunSmsRsp struct {
 	BizID string `json:"bizID"` // eg. 900619746936498440^0,  发送回执ID，可根据该ID在接口QuerySendDetails中查询具体的发送状态。
 }
 
-func (s AliyunSms) NewRequest() interface{} { return &AliyunSmsReq{} }
-func (s AliyunSms) ChannelName() string     { return aliyunsms }
+func (s AliyunSms) NewRequest() Request { return &AliyunSmsReq{} }
+func (s AliyunSms) ChannelName() string { return aliyunsms }
 
 // Notify 发送短信
-func (s AliyunSms) Notify(_ *App, request interface{}) NotifyRsp {
+func (s AliyunSms) Notify(_ *App, request Request) NotifyRsp {
 	req := request.(*AliyunSmsReq)
 	param, outID := s.createParams(req)
 	u, _ := gou.BuildURL("http://dysmsapi.aliyuncs.com/", param)
@@ -68,7 +74,7 @@ func (s AliyunSms) Notify(_ *App, request interface{}) NotifyRsp {
 
 var _ SmsNotifier = (*AliyunSms)(nil)
 
-func (s AliyunSms) ConvertRequest(r *SmsReq) interface{} {
+func (s AliyunSms) ConvertRequest(r *SmsReq) Request {
 	return &AliyunSmsReq{TemplateParams: r.TemplateParams, Mobiles: r.Mobiles}
 }
 
