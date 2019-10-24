@@ -1,6 +1,9 @@
 package api
 
-import "github.com/sirupsen/logrus"
+import (
+	"github.com/sirupsen/logrus"
+	"strings"
+)
 
 // RedList 表示红名单，红名单里面配置的人，不可以被“骚扰”
 type RedList struct {
@@ -16,12 +19,16 @@ type redList struct {
 	qywxUserIds map[string]bool
 }
 
+func TrimSpaceToLower(s string) string { return strings.ToLower(strings.TrimSpace(s)) }
+
 // SliceToMap 切片转换为 map[string]bool
 func SliceToMap(slice []string) map[string]bool {
 	m := make(map[string]bool)
 
 	for _, s := range slice {
-		m[s] = true
+		if ss := TrimSpaceToLower(s); ss != "" {
+			m[ss] = true
+		}
 	}
 
 	return m
@@ -33,7 +40,11 @@ func FilterSlice(slice []string, m map[string]bool) []string {
 	filtered := make([]string, 0)
 
 	for _, k := range slice {
-		if _, ok := m[k]; !ok {
+		if k = strings.TrimSpace(k); k == "" {
+			continue
+		}
+
+		if _, ok := m[strings.ToLower(k)]; !ok {
 			ret = append(ret, k)
 		} else {
 			filtered = append(filtered, k)
@@ -57,9 +68,6 @@ func (l RedList) prepare() redList {
 	return r
 }
 
-func (l redList) FilterQywxUserIds(userid []string) []string {
-	return FilterSlice(userid, l.qywxUserIds)
-}
-
-func (l redList) FilterMails(mails []string) []string     { return FilterSlice(mails, l.mails) }
 func (l redList) FilterMobiles(mobiles []string) []string { return FilterSlice(mobiles, l.mobiles) }
+func (l redList) FilterMails(mails []string) []string     { return FilterSlice(mails, l.mails) }
+func (l redList) FilterQywxUserIds(ids []string) []string { return FilterSlice(ids, l.qywxUserIds) }
