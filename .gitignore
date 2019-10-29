@@ -23,3 +23,4 @@ notify4g
 notify4g_linux_amd64
 ctl
 var/
+build/
