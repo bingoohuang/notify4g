@@ -35,6 +35,12 @@ for dev:
 1. `./notify4g -i -s "~/notify4g/snapshot"` to init ctl shell scripts.
 1. or by `export NOTIFY4G_SNAPSHOTDIR=~/notify4g/snapshotenv` to specified snapshotDir.
 
+## Build Rpm
+
+```bash
+make package-standalone
+```
+
 ## snapshots
 
 ![image](doc/snapshot20190527145707.png)
