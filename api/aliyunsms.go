@@ -84,7 +84,7 @@ func (s AliyunSms) createParams(req *AliyunSmsReq) (map[string]string, string) {
 	param := map[string]string{
 		"SignatureMethod":  "HMAC-SHA1", // 以下 系统参数
 		"SignatureNonce":   uuid.New(),
-		"AccessKeyID":      s.AccessKeyID,
+		"AccessKeyId":      s.AccessKeyID,
 		"SignatureVersion": "1.0",
 		"Timestamp":        time.Now().UTC().Format(time.RFC3339),
 		"Format":           "JSON",
