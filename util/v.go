@@ -1,6 +1,6 @@
 package util
 
 const (
-	Version = "2019-10-23 14:33:43 +0800 @5ace0c271f0a388485c56fc1a4d953f0a50269c2 @"
-	Compile = "2019-10-23 16:22:44 +0800 by go version go1.13.3 darwin/amd64"
+	Version = "2019-10-30 14:42:19 +0800 @021c42080af268e794488ca7609d4a102475470d @"
+	Compile = "2019-10-30 14:49:15 +0800 by go version go1.13.1 darwin/amd64"
 )

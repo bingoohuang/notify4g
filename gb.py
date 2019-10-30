@@ -39,6 +39,7 @@ binary = args.binary if args.binary else os.path.basename(os.getcwd())
 
 os_exec('./gv.sh')
 os_exec('statiq -src=res')
-os_exec(env + 'go build -o ' + binary)
+build_command = env + 'go build -o ' + binary + " ./cmd/notify4g"
+os_exec(build_command)
 
 os_exec('upx ' + binary, check_cmd='upx') if args.upx else 0
