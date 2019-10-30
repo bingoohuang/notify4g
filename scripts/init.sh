@@ -111,7 +111,7 @@ if [ ! -d "$piddir" ]; then
 fi
 
 # Configuration file
-config=/etc/notify4g/notify4g.conf
+config=/etc/notify4g/notify4g.toml
 confdir=/etc/notify4g/notify4g.d
 
 # If the daemon is not there, then exit.
@@ -137,13 +137,9 @@ case $1 in
         fi
 
         log_success_msg "Starting the process" "$name"
-        if command -v startproc >/dev/null; then
-            startproc -u "$USER" -g "$GROUP" -p "$pidfile" -q -- "$daemon" -pidfile "$pidfile" -config "$config" -config-directory "$confdir" $NOTIFY4G_OPTS
-        elif which start-stop-daemon > /dev/null 2>&1; then
-            start-stop-daemon --chuid $USER:$GROUP --start --quiet --pidfile $pidfile --exec $daemon -- -pidfile $pidfile -config $config -config-directory $confdir $NOTIFY4G_OPTS >>$STDOUT 2>>$STDERR &
-        else
-            su -s /bin/sh -c "nohup $daemon -pidfile $pidfile -config $config -config-directory $confdir $NOTIFY4G_OPTS >>$STDOUT 2>>$STDERR &" $USER
-        fi
+
+        su -s /bin/sh -c "nohup $daemon -c $config $NOTIFY4G_OPTS >>$STDOUT 2>>$STDERR & echo \$! > $pidfile" $USER
+
         log_success_msg "$name process was started"
         ;;
 
