@@ -6,6 +6,7 @@ require (
 	github.com/bingoohuang/faker v0.0.0-20190521151430-dcff11ac7f06
 	github.com/bingoohuang/gou v0.0.0-20190627060828-ff1e7cf178f2
 	github.com/bingoohuang/statiq v0.2.1
+	github.com/magiconair/properties v1.8.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.8.0
