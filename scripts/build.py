@@ -37,7 +37,7 @@ POSTREMOVE_SCRIPT = "scripts/post-remove.sh"
 PREREMOVE_SCRIPT = "scripts/pre-remove.sh"
 
 # Default AWS S3 bucket for uploads
-DEFAULT_BUCKET = "dl.influxdata.com/rigaga/artifacts"
+DEFAULT_BUCKET = ""
 
 CONFIGURATION_FILES = [
     CONFIG_DIR + '/' + CONFIG_FILE,
@@ -49,7 +49,7 @@ PACKAGE_LICENSE = "MIT"
 PACKAGE_URL = "https://github.com/gobars/rigaga"
 MAINTAINER = "support@bjca.org.cn"
 VENDOR = "RigagaData"
-DESCRIPTION = "Plugin-driven server agent for reporting metrics into InfluxDB."
+DESCRIPTION = "rigaga for notify4g"
 
 # SCRIPT START
 prereqs = ['git', 'go']
@@ -732,7 +732,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=LOG_LEVEL,
                         format=log_format)
 
-    parser = argparse.ArgumentParser(description='InfluxDB build and packaging script.')
+    parser = argparse.ArgumentParser(description='Notify4g build and packaging script.')
     parser.add_argument('--verbose', '-v', '--debug',
                         action='store_true',
                         help='Use debug output')
@@ -778,15 +778,15 @@ if __name__ == '__main__':
                         help='Package iteration to apply to build output (defaults to 1)')
     parser.add_argument('--stats',
                         action='store_true',
-                        help='Emit build metrics (requires InfluxDB Python client)')
+                        help='Emit build metrics (requires Notify4g Python client)')
     parser.add_argument('--stats-server',
                         metavar='<hostname:port>',
                         type=str,
-                        help='Send build stats to InfluxDB using provided hostname and port')
+                        help='Send build stats to Notify4g using provided hostname and port')
     parser.add_argument('--stats-db',
                         metavar='<database name>',
                         type=str,
-                        help='Send build stats to InfluxDB using provided database name')
+                        help='Send build stats to Notify4g using provided database name')
     parser.add_argument('--nightly',
                         action='store_true',
                         help='Mark build output as nightly build (will incremement the minor version)')
