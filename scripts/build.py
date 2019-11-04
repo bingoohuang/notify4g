@@ -24,6 +24,8 @@ CONFIG_DIR = "/etc/notify4g"
 CONFIG_FILE = "notify4g.toml"
 CONFIG_DIR_D = "/etc/notify4g/notify4g.d"
 LOGROTATE_DIR = "/etc/logrotate.d"
+LOGROTATE_FILE = "notify4g"
+
 RUN_USER = "rigaga"
 
 INIT_SCRIPT = "scripts/init.sh"
@@ -41,7 +43,7 @@ DEFAULT_BUCKET = ""
 
 CONFIGURATION_FILES = [
     CONFIG_DIR + '/' + CONFIG_FILE,
-    LOGROTATE_DIR + '/notify4g',
+    LOGROTATE_DIR + '/' + LOGROTATE_FILE,
 ]
 
 # META-PACKAGE VARIABLES
@@ -73,7 +75,7 @@ fpm_common_args = "-f -s dir --log error \
     PACKAGE_LICENSE,
     MAINTAINER,
     CONFIG_DIR + '/' + CONFIG_FILE,
-    LOGROTATE_DIR + '/rigaga',
+    LOGROTATE_DIR + '/notify4g',
     POSTINST_SCRIPT,
     PREINST_SCRIPT,
     POSTREMOVE_SCRIPT,
@@ -147,8 +149,8 @@ def package_scripts(build_root, role, config_only=False, windows=False):
         os.chmod(os.path.join(build_root, SCRIPT_DIR[1:], INIT_SCRIPT.split('/')[1]), 0o644)
         shutil.copyfile(SYSTEMD_SCRIPT, os.path.join(build_root, SCRIPT_DIR[1:], SYSTEMD_SCRIPT.split('/')[1]))
         os.chmod(os.path.join(build_root, SCRIPT_DIR[1:], SYSTEMD_SCRIPT.split('/')[1]), 0o644)
-        shutil.copyfile(LOGROTATE_SCRIPT, os.path.join(build_root, LOGROTATE_DIR[1:], RUN_USER))
-        os.chmod(os.path.join(build_root, LOGROTATE_DIR[1:], RUN_USER), 0o644)
+        shutil.copyfile(LOGROTATE_SCRIPT, os.path.join(build_root, LOGROTATE_DIR[1:], LOGROTATE_FILE))
+        os.chmod(os.path.join(build_root, LOGROTATE_DIR[1:], LOGROTATE_FILE), 0o644)
         shutil.copyfile(DEFAULT_CONFIG.format(role), os.path.join(build_root, CONFIG_DIR[1:], CONFIG_FILE))
         os.chmod(os.path.join(build_root, CONFIG_DIR[1:], CONFIG_FILE), 0o644)
 

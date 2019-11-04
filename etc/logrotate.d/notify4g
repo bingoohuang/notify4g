@@ -1,4 +1,4 @@
-/var/log/notify4g/*.log
+/var/log/notify4g/notify4g.log.*
 {
     rotate 6
     daily
