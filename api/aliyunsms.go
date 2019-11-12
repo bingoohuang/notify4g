@@ -85,7 +85,7 @@ func (s AliyunSms) createParams(req *AliyunSmsReq) (map[string]string, string) {
 	param := map[string]string{
 		"SignatureMethod":  "HMAC-SHA1", // 以下 系统参数
 		"SignatureNonce":   uuid.New(),
-		"AccessKeyID":      s.AccessKeyID,
+		"AccessKeyId":      s.AccessKeyID,
 		"SignatureVersion": "1.0",
 		"Timestamp":        time.Now().UTC().Format(time.RFC3339),
 		"Format":           "JSON",
@@ -95,7 +95,7 @@ func (s AliyunSms) createParams(req *AliyunSmsReq) (map[string]string, string) {
 		"RegionId":      "cn-hangzhou",
 		"PhoneNumbers":  strings.Join(req.Mobiles, ","),
 		"SignName":      gou.EmptyTo(req.SignName, s.SignName),
-		"TemplateParam": string(gou.JSON(req.TemplateParams)),
+		"TemplateParam": string(gou.JSON(Filter(req.TemplateParams))),
 		"TemplateCode":  gou.EmptyTo(req.TemplateCode, s.TemplateCode),
 		"OutID":         outID}
 	str := "" // 3. 构造待签名的字符串
@@ -108,6 +108,15 @@ func (s AliyunSms) createParams(req *AliyunSmsReq) (map[string]string, string) {
 	param["Signature"] = gou.HmacSha1(toSign, s.AccessKeySecret+"&") // 4. 签名
 
 	return param, outID
+}
+
+func Filter(m map[string]string) interface{} {
+	for k, v := range m {
+		if len(v) >= 20 {
+			m[k] = v[0:19] + "…"
+		}
+	}
+	return m
 }
 
 func enc(s string) string {

@@ -1,0 +1,16 @@
+[Unit]
+Description=The plugin-driven server agent for reporting metrics into InfluxDB
+Documentation=https://github.com/gobars/notify4g
+After=network.target
+
+[Service]
+EnvironmentFile=-/etc/default/notify4g
+User=rigaga
+ExecStart=/usr/bin/notify4g -c /etc/notify4g/notify4g.toml $NOTIFY4G_OPTS
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartForceExitStatus=SIGPIPE
+KillMode=control-group
+
+[Install]
+WantedBy=multi-user.target

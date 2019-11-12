@@ -1,0 +1,4 @@
+Addr=":11471"
+Auth="admin:1qazzaq1"
+SnapshotDir="/etc/notify4g/snapshots"
+Logdir="/var/log/notify4g"
