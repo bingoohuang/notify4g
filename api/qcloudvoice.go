@@ -3,6 +3,8 @@ package api
 import (
 	"strings"
 
+	"github.com/bingoohuang/gonet"
+
 	"github.com/bingoohuang/gou"
 	"github.com/sirupsen/logrus"
 
@@ -105,7 +107,7 @@ func (s QcloudVoice) Notify(_ *App, request Request) NotifyRsp {
 	}
 
 	var rsp RawQcloudVoiceRsp
-	_, err := gou.RestPost(url, req, &rsp)
+	_, err := gonet.RestPost(url, req, &rsp)
 
 	return MakeRsp(err, rsp.Result == 0, s.ChannelName(), rsp)
 }

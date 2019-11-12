@@ -1,8 +1,11 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
 	"strings"
+
+	"github.com/bingoohuang/gonet"
 
 	"github.com/bingoohuang/gou"
 	"github.com/sirupsen/logrus"
@@ -20,15 +23,15 @@ type QywxTokenResult struct {
 func GetQywxAccessToken(corpID, corpSecret string) (string, error) {
 	url := "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=" + corpID + "&corpsecret=" + corpSecret
 	logrus.Debugf("url:%s", url)
-	resp, err := gou.UrlGet(url)
-	logrus.Debugf("resp:%+v, err:%+v", resp, err)
+	resp, err := gonet.HTTPGet(url)
+	logrus.Debugf("resp:%+v, err:%+v", string(resp), err)
 
 	if err != nil {
 		return "", err
 	}
 
 	var tokenResult QywxTokenResult
-	if err := resp.ToJson(&tokenResult); err != nil {
+	if err := json.Unmarshal(resp, &tokenResult); err != nil {
 		return "", err
 	}
 
@@ -48,7 +51,7 @@ func SendQywxMsg(accessToken, agentID, content string, userIds []string) (QywxRs
 		"text": map[string]string{"content": content}}
 
 	var rsp QywxRsp
-	_, err := gou.RestPost("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token="+accessToken, msg, &rsp)
+	_, err := gonet.RestPost("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token="+accessToken, msg, &rsp)
 
 	return rsp, err
 }

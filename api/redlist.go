@@ -1,8 +1,9 @@
 package api
 
 import (
-	"github.com/sirupsen/logrus"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 // RedList 表示红名单，红名单里面配置的人，不可以被“骚扰”

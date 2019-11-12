@@ -3,6 +3,8 @@ package api
 import (
 	"strings"
 
+	"github.com/bingoohuang/gonet"
+
 	"github.com/bingoohuang/gou"
 	"github.com/thoas/go-funk"
 
@@ -115,7 +117,7 @@ func (q QcloudSms) Notify(app *App, request Request) NotifyRsp {
 	}
 
 	var rsp QcloudSmsRsp
-	_, err := gou.RestPost(url, req, &rsp)
+	_, err := gonet.RestPost(url, req, &rsp)
 
 	return MakeRsp(err, rsp.Result == 0, q.ChannelName(), rsp)
 }

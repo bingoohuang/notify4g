@@ -3,7 +3,8 @@ package api
 import (
 	"fmt"
 
-	"github.com/bingoohuang/gou"
+	"github.com/bingoohuang/gonet"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -106,7 +107,7 @@ type DingResponse struct {
 
 func (r Robot) send(msg interface{}) (DingResponse, error) {
 	var dr DingResponse
-	_, err := gou.RestPost(r.Webhook, msg, &dr)
+	_, err := gonet.RestPost(r.Webhook, msg, &dr)
 
 	if err != nil {
 		return dr, err

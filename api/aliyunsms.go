@@ -3,6 +3,7 @@ package api
 import (
 	"net/url"
 
+	"github.com/bingoohuang/gonet"
 	"github.com/bingoohuang/gou"
 	"github.com/sirupsen/logrus"
 	"github.com/tobyzxj/uuid"
@@ -67,7 +68,7 @@ func (s AliyunSms) Notify(_ *App, request Request) NotifyRsp {
 	u, _ := gou.BuildURL("http://dysmsapi.aliyuncs.com/", param)
 
 	r := AliyunSmsRsp{OutID: outID}
-	err := gou.RestGet(u, &r)
+	err := gonet.RestGet(u, &r)
 
 	return MakeRsp(err, r.Code == "OK", s.ChannelName(), r)
 }
