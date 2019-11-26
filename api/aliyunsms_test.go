@@ -1,8 +1,9 @@
 package api
 
 import (
-	"github.com/magiconair/properties/assert"
 	"testing"
+
+	"github.com/magiconair/properties/assert"
 )
 
 func TestFilter(t *testing.T) {
@@ -15,5 +16,4 @@ func TestFilter(t *testing.T) {
 	assert.Equal(t, m["a"], "1234567890987654321…")
 	assert.Equal(t, m["b"], "1234567890987654321")
 	assert.Equal(t, m["c"], "1234567890987654321…")
-
 }

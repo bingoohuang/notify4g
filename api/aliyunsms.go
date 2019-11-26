@@ -3,8 +3,12 @@ package api
 import (
 	"net/url"
 
+	"github.com/bingoohuang/goreflect"
+	"github.com/bingoohuang/gou/enc"
+	"github.com/bingoohuang/gou/ran"
+	"github.com/bingoohuang/gou/str"
+
 	"github.com/bingoohuang/gonet"
-	"github.com/bingoohuang/gou"
 	"github.com/sirupsen/logrus"
 	"github.com/tobyzxj/uuid"
 
@@ -24,7 +28,7 @@ var _ Config = (*AliyunSms)(nil)
 
 // Config 创建发送器，要求参数 config 是{accessKeyId}/{accessKeySecret}/{templateCode}/{signName}的格式
 func (s *AliyunSms) Config(config string) error {
-	s.AccessKeyID, s.AccessKeySecret, s.TemplateCode, s.SignName = gou.Split4(config, "/", true, false)
+	s.AccessKeyID, s.AccessKeySecret, s.TemplateCode, s.SignName = str.Split4(config, "/", true, false)
 	return nil
 }
 
@@ -65,7 +69,7 @@ func (s AliyunSms) ChannelName() string { return aliyunsms }
 func (s AliyunSms) Notify(_ *App, request Request) NotifyRsp {
 	req := request.(*AliyunSmsReq)
 	param, outID := s.createParams(req)
-	u, _ := gou.BuildURL("http://dysmsapi.aliyuncs.com/", param)
+	u, _ := gonet.BuildURL("http://dysmsapi.aliyuncs.com/", param)
 
 	r := AliyunSmsRsp{OutID: outID}
 	err := gonet.RestGet(u, &r)
@@ -81,7 +85,7 @@ func (s AliyunSms) ConvertRequest(r *SmsReq) Request {
 
 // api doc: https://help.aliyun.com/document_detail/101414.html?spm=a2c4g.11186623.6.616.1eee202a1PxPlf
 func (s AliyunSms) createParams(req *AliyunSmsReq) (map[string]string, string) {
-	outID := gou.RandomString(16)
+	outID := ran.String(16)
 	param := map[string]string{
 		"SignatureMethod":  "HMAC-SHA1", // 以下 系统参数
 		"SignatureNonce":   uuid.New(),
@@ -94,18 +98,18 @@ func (s AliyunSms) createParams(req *AliyunSmsReq) (map[string]string, string) {
 		"Version":       "2017-05-25",
 		"RegionId":      "cn-hangzhou",
 		"PhoneNumbers":  strings.Join(req.Mobiles, ","),
-		"SignName":      gou.EmptyTo(req.SignName, s.SignName),
-		"TemplateParam": string(gou.JSON(Filter(req.TemplateParams))),
-		"TemplateCode":  gou.EmptyTo(req.TemplateCode, s.TemplateCode),
+		"SignName":      str.EmptyThen(req.SignName, s.SignName),
+		"TemplateParam": enc.JSON(Filter(req.TemplateParams)),
+		"TemplateCode":  str.EmptyThen(req.TemplateCode, s.TemplateCode),
 		"OutID":         outID}
 	str := "" // 3. 构造待签名的字符串
 
-	gou.IterateMapSorted(param, func(k, v string) { str += "&" + enc(k) + "=" + enc(v) })
+	goreflect.WalkMap(param, func(k, v string) { str += "&" + encx(k) + "=" + encx(v) })
 
-	toSign := "GET&" + enc("/") + "&" + enc(str[1:])
+	toSign := "GET&" + encx("/") + "&" + encx(str[1:])
 	logrus.Debugf("toSign:【%s】", toSign)
 
-	param["Signature"] = gou.HmacSha1(toSign, s.AccessKeySecret+"&") // 4. 签名
+	param["Signature"] = enc.HmacSha1(toSign, s.AccessKeySecret+"&") // 4. 签名
 
 	return param, outID
 }
@@ -116,10 +120,11 @@ func Filter(m map[string]string) interface{} {
 			m[k] = v[0:19] + "…"
 		}
 	}
+
 	return m
 }
 
-func enc(s string) string {
+func encx(s string) string {
 	s = url.QueryEscape(s)
 	s = strings.Replace(s, "+", "%20", -1)
 	s = strings.Replace(s, "*", "%2A", -1)

@@ -5,9 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
-	"github.com/bingoohuang/gou"
+	"github.com/bingoohuang/now"
 	"github.com/mitchellh/go-homedir"
 	"github.com/sirupsen/logrus"
 )
@@ -37,7 +36,7 @@ const DeletedAt = ".deletedAt."
 
 func (s SnapshotService) Delete(file string) error {
 	from := filepath.Join(s.Dir, file)
-	to := filepath.Join(s.Dir, file+DeletedAt+gou.FormatDateLayout(time.Now(), "yyyyMMddHHmmss"))
+	to := filepath.Join(s.Dir, file+DeletedAt+now.MakeNow().Format("yyyyMMddHHmmss"))
 
 	return os.Rename(from, to)
 }

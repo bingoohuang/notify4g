@@ -3,9 +3,12 @@ package api
 import (
 	"strings"
 
+	"github.com/bingoohuang/gou/ran"
+
+	"github.com/bingoohuang/gou/str"
+
 	"github.com/bingoohuang/gonet"
 
-	"github.com/bingoohuang/gou"
 	"github.com/sirupsen/logrus"
 
 	"strconv"
@@ -25,7 +28,7 @@ var _ Config = (*QcloudVoice)(nil)
 // Config 加载配置
 func (s *QcloudVoice) Config(config string) error {
 	var tplID, playTimes, varNames string
-	s.Sdkappid, s.Appkey, tplID, playTimes, varNames = gou.Split5(config, "/", true, false)
+	s.Sdkappid, s.Appkey, tplID, playTimes, varNames = str.Split5(config, "/", true, false)
 	s.TplID, _ = strconv.Atoi(tplID)
 	s.PlayTimes, _ = strconv.Atoi(playTimes)
 	s.TmplVarNames = strings.SplitN(varNames, "-", -1)
@@ -88,10 +91,10 @@ func (s QcloudVoice) ChannelName() string { return qcloudvoice }
 func (s QcloudVoice) Notify(_ *App, request Request) NotifyRsp {
 	r := request.(*QcloudVoiceReq)
 
-	rando := gou.RandomIntAsString()
+	rando := ran.IntAsString()
 	// 发送语音通知 https://cloud.tencent.com/document/product/382/18155
 	// https://github.com/tencentyun/qcloud-documents/blob/master/product/移动与通信/短信/开发指南/API 文档/语音API/指定模板发送语音.md
-	url, _ := gou.BuildURL("https://cloud.tim.qq.com/v5/tlsvoicesvr/sendtvoice",
+	url, _ := gonet.BuildURL("https://cloud.tim.qq.com/v5/tlsvoicesvr/sendtvoice",
 		map[string]string{"sdkappid": s.Sdkappid, "random": rando})
 	logrus.Infof("url:%s", url)
 

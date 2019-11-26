@@ -16,9 +16,12 @@ func main() {
 	util.InitFlags()
 
 	sfs, _ := fs.New()
+
 	_ = faker.SetRandomMapAndSliceSize(1, 3)
 
-	app := api.CreateApp(viper.GetString("snapshotDir"))
+	snapshotDir := viper.GetString("snapshotDir")
+	nopConfID := viper.GetString("nopConfID")
+	app := api.CreateApp(snapshotDir, nopConfID)
 
 	http.HandleFunc("/", auth(api.HandleHome(app, string(sfs.Files["/home.html"].Data))))
 	http.HandleFunc("/raw/", api.HandleRaw(app, "/raw/"))

@@ -7,7 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bingoohuang/gou"
+	"github.com/bingoohuang/gou/lo"
+
+	"github.com/bingoohuang/gou/htt"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -21,10 +24,11 @@ func InitFlags() {
 	pflag.StringP("loglevel", "l", "info", "debug/info/warn/error")
 	pflag.StringP("logdir", "d", "./var", "log dir")
 	pflag.StringP("auth", "u", "", "basic auth username and password eg admin:admin")
+	pflag.StringP("nopConfID", "", "nop", "nopConfID for no op testing")
 	pflag.BoolP("logrus", "o", true, "enable logrus")
 	pflag.StringP("snapshotDir", "s", "./etc/snapshots", "snapshots for config")
 
-	pprofAddr := gou.PprofAddrPflag()
+	pprofAddr := htt.PprofAddrPflag()
 
 	// Add more pflags can be set from command line
 	// ...
@@ -45,7 +49,7 @@ func InitFlags() {
 	}
 
 	Ipo(*ipo)
-	gou.StartPprof(*pprofAddr)
+	htt.StartPprof(*pprofAddr)
 
 	viper.SetEnvPrefix("NOTIFY4G")
 	viper.AutomaticEnv()
@@ -54,8 +58,9 @@ func InitFlags() {
 
 	if fileExists(*configFile) {
 		viper.SetConfigFile(*configFile)
+
 		if err := viper.ReadInConfig(); err != nil {
-			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+			panic(fmt.Errorf("fatal error config file: %w", err))
 		}
 	}
 
@@ -66,7 +71,7 @@ func InitFlags() {
 		}
 
 		loglevel := viper.GetString("loglevel")
-		gou.InitLogger(loglevel, logdir, filepath.Base(os.Args[0])+".log")
+		lo.InitLogger(loglevel, logdir, filepath.Base(os.Args[0])+".log")
 	} else {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
@@ -77,5 +82,6 @@ func fileExists(filename string) bool {
 	if os.IsNotExist(err) {
 		return false
 	}
+
 	return !info.IsDir()
 }

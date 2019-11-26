@@ -3,7 +3,10 @@ package api
 import (
 	"fmt"
 
-	"github.com/bingoohuang/gou"
+	"github.com/bingoohuang/goreflect"
+	"github.com/bingoohuang/gou/ran"
+
+	"github.com/bingoohuang/gou/str"
 )
 
 // Sms 表示聚合短信发送器
@@ -17,7 +20,7 @@ var _ Config = (*Sms)(nil)
 
 // Config 创建发送器，要求参数 config 是{accessKeyId}/{accessKeySecret}/{templateCode}/{signName}的格式
 func (r *Sms) Config(config string) error {
-	r.ConfigIds = gou.SplitN(config, "/", true, true)
+	r.ConfigIds = str.SplitN(config, "/", true, true)
 	return nil
 }
 
@@ -93,7 +96,7 @@ func (r Sms) Notify(app *App, request Request) NotifyRsp {
 		return BreakIterating
 	}
 
-	gou.IterateSlice(r.ConfigIds, r.startIndex(), f)
+	goreflect.IterateSlice(r.ConfigIds, r.startIndex(), f)
 
 	return MakeRsp(err, succ, channelName, rsp)
 }
@@ -109,7 +112,7 @@ func (r Sms) maxRetryTimes(req *SmsReq) int {
 
 func (r Sms) startIndex() int {
 	if r.Random {
-		return gou.RandomIntN(uint64(len(r.ConfigIds)))
+		return ran.IntN(uint64(len(r.ConfigIds)))
 	}
 
 	return 0

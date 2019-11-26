@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/bingoohuang/gou"
+	"github.com/bingoohuang/gou/enc"
+	"github.com/bingoohuang/gou/str"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,7 +22,7 @@ var _ Config = (*AliyunDaYuSms)(nil)
 
 // Config 创建发送器，要求参数 config 是{AppKey}/{AppSecret}/{TemplateCode}/{SignName}的格式
 func (s *AliyunDaYuSms) Config(config string) error {
-	s.AppKey, s.AppSecret, s.TemplateCode, s.SignName = gou.Split4(config, "/", true, false)
+	s.AppKey, s.AppSecret, s.TemplateCode, s.SignName = str.Split4(config, "/", true, false)
 	return nil
 }
 
@@ -81,10 +83,10 @@ func (s AliyunDaYuSms) ConvertRequest(r *SmsReq) Request {
 
 func (s AliyunDaYuSms) createParams(r *AliyunDaYuSmsReq) *AlibabaAliqinFcSmsNumSendRequest {
 	req := NewAlibabaAliqinFcSmsNumSendRequest()
-	req.SmsFreeSignName = gou.EmptyTo(r.SignName, s.SignName)
+	req.SmsFreeSignName = str.EmptyThen(r.SignName, s.SignName)
 	req.RecNum = strings.Join(r.Mobiles, ",")
-	req.SmsTemplateCode = gou.EmptyTo(r.TemplateCode, s.TemplateCode)
-	req.SmsParam = string(gou.JSON(r.TemplateParams))
+	req.SmsTemplateCode = str.EmptyThen(r.TemplateCode, s.TemplateCode)
+	req.SmsParam = enc.JSON(r.TemplateParams)
 
 	return req
 }

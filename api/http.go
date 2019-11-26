@@ -7,10 +7,12 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/bingoohuang/gou/coll"
+	"github.com/bingoohuang/gou/str"
+
 	"github.com/bingoohuang/notify4g/util"
 
 	"github.com/bingoohuang/faker"
-	"github.com/bingoohuang/gou"
 )
 
 type NotifierItem struct {
@@ -27,7 +29,7 @@ type HomeData struct {
 
 func HandleHome(app *App, homeTemplate string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ids := gou.MakeMultiMap()
+		ids := coll.MakeMultiMap()
 		app.configCache.Walk(func(k string, v *NotifyConfig) {
 			ids.Put(v.Type, k)
 		})
@@ -50,7 +52,7 @@ func HandleHome(app *App, homeTemplate string) func(w http.ResponseWriter, r *ht
 	}
 }
 
-func findConfigIDs(m *gou.MultiMap, configType string) []string {
+func findConfigIDs(m *coll.MultiMap, configType string) []string {
 	arr := make([]string, 0)
 
 	if v, ok := m.Get(configType); ok {
@@ -202,7 +204,7 @@ func handleRawInternal(app *App, path string, w http.ResponseWriter, r *http.Req
 }
 
 func newTester(a *App, configType string) Tester {
-	if v := gou.Decode(configType,
+	if v := str.Decode(configType,
 		aliyunsms, &AliyunsmsTester{},
 		aliyundayusms, &AlidayuTester{},
 		dingtalkrobot, &DingtalkReqTester{},

@@ -6,8 +6,10 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/bingoohuang/gou/str"
+
 	"github.com/bingoohuang/faker"
-	"github.com/bingoohuang/gou"
+	"github.com/bingoohuang/gonet"
 	"github.com/pkg/errors"
 )
 
@@ -30,10 +32,11 @@ type Config interface {
 
 type App struct {
 	configCache *NotifyConfigCache
+	nopConfID   string // no op config ID for testing
 }
 
-func CreateApp(snapshotDir string) *App {
-	return &App{configCache: NewCache(snapshotDir)}
+func CreateApp(snapshotDir, nopConfID string) *App {
+	return &App{configCache: NewCache(snapshotDir), nopConfID: nopConfID}
 }
 
 type RawNotifyConfig struct {
@@ -78,7 +81,7 @@ type NotifyConfig struct {
 }
 
 func NewConfig(typ string) (Config, error) {
-	v := gou.Decode(typ, "aliyunsms", &AliyunSms{}, "dingtalkrobot", &Dingtalk{},
+	v := str.Decode(typ, "aliyunsms", &AliyunSms{}, "dingtalkrobot", &Dingtalk{},
 		"qcloudsms", &QcloudSms{}, "qcloudvoice", &QcloudVoice{}, "qywx", &Qywx{}, "mail", &Mail{}, "sms", &Sms{},
 		"aliyundayusms", &AliyunDaYuSms{})
 	if v != nil {
@@ -121,6 +124,10 @@ func (a *App) prepareNotify(w http.ResponseWriter, configID string) error {
 }
 
 func (a *App) postNotify(w http.ResponseWriter, r *http.Request, configID string) error {
+	if a.nopConfID == configID {
+		return WriteJSON(w, MakeRsp(nil, true, "NA", "no op response"))
+	}
+
 	c := a.configCache.Read(configID)
 	if c == nil {
 		return WriteErrorJSON(404, w, Rsp{Status: 404, Message: "configID " + configID + " not found"})
@@ -189,7 +196,7 @@ func (a *App) PostConfig(w http.ResponseWriter, r *http.Request, l int, subs []s
 		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: "invalid path"})
 	}
 
-	content := gou.ReadObjectBytes(r.Body)
+	content := gonet.ReadBytes(r.Body)
 	config, err := ParseNotifyConfig(content)
 
 	if err != nil {

@@ -3,7 +3,8 @@ package api
 import (
 	"fmt"
 
-	"github.com/bingoohuang/gou"
+	"github.com/bingoohuang/gou/enc"
+	"github.com/bingoohuang/gou/str"
 )
 
 type QcloudBase struct {
@@ -13,8 +14,8 @@ type QcloudBase struct {
 
 func (q QcloudBase) CreateSignature(rand string, t int64, nums ...string) string {
 	src := fmt.Sprintf("appkey=%s&random=%s&time=%d&mobile=%s",
-		q.Appkey, rand, t, gou.JoinNonEmpty(",", nums...))
-	s, _ := gou.Sha256(src)
+		q.Appkey, rand, t, str.JoinNonEmpty(",", nums...))
+	s, _ := enc.Sha256(src)
 
 	return s
 }

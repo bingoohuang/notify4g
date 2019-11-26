@@ -5,9 +5,10 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/bingoohuang/gou/str"
+
 	"github.com/bingoohuang/gonet"
 
-	"github.com/bingoohuang/gou"
 	"github.com/sirupsen/logrus"
 )
 
@@ -77,7 +78,7 @@ var _ Config = (*Qywx)(nil)
 
 // Config 创建发送器，要求参数 config 是{corpID}/{corpSecret}/{agentID}的格式
 func (s *Qywx) Config(config string) error {
-	s.CorpID, s.CorpSecret, s.AgentID = gou.Split3(config, "/", true, false)
+	s.CorpID, s.CorpSecret, s.AgentID = str.Split3(config, "/", true, false)
 
 	return nil
 }

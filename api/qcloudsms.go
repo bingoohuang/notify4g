@@ -3,9 +3,12 @@ package api
 import (
 	"strings"
 
+	"github.com/bingoohuang/gou/ran"
+
+	"github.com/bingoohuang/gou/str"
+
 	"github.com/bingoohuang/gonet"
 
-	"github.com/bingoohuang/gou"
 	"github.com/thoas/go-funk"
 
 	"strconv"
@@ -28,7 +31,7 @@ var _ Config = (*QcloudSms)(nil)
 func (q *QcloudSms) Config(config string) error {
 	var tplID, varNames string
 
-	q.Sdkappid, q.Appkey, tplID, q.Sign, varNames = gou.Split5(config, "/", true, false)
+	q.Sdkappid, q.Appkey, tplID, q.Sign, varNames = str.Split5(config, "/", true, false)
 	q.TplID, _ = strconv.Atoi(tplID)
 	q.TmplVarNames = strings.SplitN(varNames, "-", -1)
 
@@ -100,9 +103,9 @@ func (q QcloudSms) NewRequest() Request { return &QcloudSmsReq{} }
 func (q QcloudSms) Notify(app *App, request Request) NotifyRsp {
 	r := request.(*QcloudSmsReq)
 
-	rando := gou.RandomIntAsString()
+	rando := ran.IntAsString()
 	// 指定模板群发短信 https://cloud.tencent.com/document/product/382/5977
-	url, _ := gou.BuildURL("https://yun.tim.qq.com/v5/tlssmssvr/sendmultisms2",
+	url, _ := gonet.BuildURL("https://yun.tim.qq.com/v5/tlssmssvr/sendmultisms2",
 		map[string]string{"sdkappid": q.Sdkappid, "random": rando})
 	logrus.Infof("url:%s", url)
 

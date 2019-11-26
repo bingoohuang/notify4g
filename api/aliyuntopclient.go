@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bingoohuang/gou"
+	"github.com/bingoohuang/gou/str"
 )
 
 type AlibabaRequest interface {
@@ -90,7 +90,7 @@ func (client *TopClient) buildParams(req AlibabaRequest) (url.Values, error) {
 		"format":         client.Format,
 		"v":              client.V,
 		"partner_id":     client.PartnerID,
-		"simplify":       gou.If(client.Simplify, "1", "0"),
+		"simplify":       str.If(client.Simplify, "1", "0"),
 	}
 
 	data, err := json.Marshal(req)

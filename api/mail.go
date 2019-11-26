@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/bingoohuang/gou"
+	"github.com/bingoohuang/gou/str"
 	"gopkg.in/gomail.v2"
 
 	"strconv"
@@ -21,7 +21,7 @@ var _ Config = (*Mail)(nil)
 // Config 加载配置
 func (q *Mail) Config(config string) error {
 	var port string
-	q.SMTPAddr, port, q.From, q.Username, q.Pass = gou.Split5(config, "/", true, false)
+	q.SMTPAddr, port, q.From, q.Username, q.Pass = str.Split5(config, "/", true, false)
 	q.SMTPPort, _ = strconv.Atoi(port)
 
 	return nil
