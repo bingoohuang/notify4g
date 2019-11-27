@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/bingoohuang/now"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
 
@@ -125,6 +127,7 @@ func (a *App) prepareNotify(w http.ResponseWriter, configID string) error {
 
 func (a *App) postNotify(w http.ResponseWriter, r *http.Request, configID string) error {
 	if a.nopConfID == configID {
+		logrus.Infof("nop... %s", now.MakeNow().Format(now.DayTimeFmt))
 		return WriteJSON(w, MakeRsp(nil, true, "NA", "no op response"))
 	}
 
