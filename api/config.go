@@ -3,10 +3,11 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bingoohuang/now"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
+
+	"github.com/bingoohuang/now"
+	"github.com/sirupsen/logrus"
 
 	"github.com/bingoohuang/gou/str"
 
@@ -102,6 +103,12 @@ func (a *App) NotifyByConfig(removePath string) func(w http.ResponseWriter, r *h
 		}
 		configID := subs[0]
 
+		if a.nopConfID == configID {
+			logrus.Infof("nop... %s", now.MakeNow().Format(now.DayTimeFmt))
+			_ = WriteJSON(w, MakeRsp(nil, true, "NA", "no op response"))
+			return
+		}
+
 		switch r.Method {
 		case GET:
 			_ = a.prepareNotify(w, configID)
@@ -126,11 +133,6 @@ func (a *App) prepareNotify(w http.ResponseWriter, configID string) error {
 }
 
 func (a *App) postNotify(w http.ResponseWriter, r *http.Request, configID string) error {
-	if a.nopConfID == configID {
-		logrus.Infof("nop... %s", now.MakeNow().Format(now.DayTimeFmt))
-		return WriteJSON(w, MakeRsp(nil, true, "NA", "no op response"))
-	}
-
 	c := a.configCache.Read(configID)
 	if c == nil {
 		return WriteErrorJSON(404, w, Rsp{Status: 404, Message: "configID " + configID + " not found"})
