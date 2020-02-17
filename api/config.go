@@ -53,7 +53,7 @@ func (r RawNotifyConfig) ParseConfig() (Config, error) {
 		return nil, err
 	}
 
-	if err := json.Unmarshal([]byte(r.Config), v); err != nil {
+	if err := json.Unmarshal(r.Config, v); err != nil {
 		return nil, err
 	}
 
@@ -71,7 +71,7 @@ func ParseNotifyConfig(content []byte) (*NotifyConfig, error) {
 		return nil, err
 	}
 
-	if err := json.Unmarshal([]byte(raw.Config), c); err != nil {
+	if err := json.Unmarshal(raw.Config, c); err != nil {
 		return nil, err
 	}
 
