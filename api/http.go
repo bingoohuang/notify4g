@@ -30,6 +30,7 @@ type HomeData struct {
 func HandleHome(app *App, homeTemplate string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ids := coll.MakeMultiMap()
+
 		app.configCache.Walk(func(k string, v *NotifyConfig) {
 			ids.Put(v.Type, k)
 		})
@@ -155,13 +156,15 @@ func HandleRedlist(a *App) func(w http.ResponseWriter, r *http.Request) {
 		case POST:
 			var list RedList
 			if err := json.NewDecoder(r.Body).Decode(&list); err != nil {
-				_ = WriteErrorJSON(400, w, Rsp{Status: 400, Message: err.Error()})
+				_ = WriteErrorJSON(http.StatusBadRequest, w,
+					Rsp{Status: http.StatusBadRequest, Message: err.Error()})
 			} else {
 				_ = a.configCache.WriteRedList(list, true)
-				_ = WriteJSON(w, Rsp{Status: 200, Message: "OK"})
+				_ = WriteJSON(w, Rsp{Status: http.StatusOK, Message: "OK"})
 			}
 		default:
-			_ = WriteErrorJSON(404, w, Rsp{Status: 404, Message: "Not Found"})
+			_ = WriteErrorJSON(http.StatusNotFound, w,
+				Rsp{Status: http.StatusNotFound, Message: "Not Found"})
 		}
 	}
 }
@@ -175,14 +178,16 @@ func HandleRaw(app *App, path string) func(w http.ResponseWriter, r *http.Reques
 func handleRawInternal(app *App, path string, w http.ResponseWriter, r *http.Request) error {
 	subs := strings.SplitN(r.URL.Path[len(path):], "/", -1)
 	if len(subs) != 1 {
-		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: "invalid path"})
+		return WriteErrorJSON(http.StatusBadRequest, w,
+			Rsp{Status: http.StatusBadRequest, Message: "invalid path"})
 	}
 
 	configType := subs[0]
 	tester := newTester(app, configType)
 
 	if tester == nil {
-		return WriteErrorJSON(400, w, Rsp{Status: 400, Message: "invalid type " + configType})
+		return WriteErrorJSON(http.StatusBadRequest, w,
+			Rsp{Status: http.StatusBadRequest, Message: "invalid type " + configType})
 	}
 
 	switch r.Method {
@@ -192,14 +197,16 @@ func handleRawInternal(app *App, path string, w http.ResponseWriter, r *http.Req
 		return WriteJSON(w, tester)
 	case POST:
 		if err := json.NewDecoder(r.Body).Decode(tester); err != nil {
-			return WriteErrorJSON(400, w, Rsp{Status: 400, Message: err.Error()})
+			return WriteErrorJSON(http.StatusBadRequest, w,
+				Rsp{Status: http.StatusBadRequest, Message: err.Error()})
 		}
 
 		rsp := tester.Send(app)
 
 		return WriteJSON(w, rsp)
 	default:
-		return WriteErrorJSON(404, w, Rsp{Status: 404, Message: "Not Found"})
+		return WriteErrorJSON(http.StatusNotFound, w,
+			Rsp{Status: http.StatusNotFound, Message: "Not Found"})
 	}
 }
 

@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/bingoohuang/goreflect"
 	"github.com/bingoohuang/gou/ran"
@@ -83,7 +84,7 @@ func (r Sms) Notify(app *App, request Request) NotifyRsp {
 		r := smsNotifier.ConvertRequest(req)
 		rsp = nc.Config.Notify(app, r)
 
-		if rsp.Status == 200 {
+		if rsp.Status == http.StatusOK {
 			succ = true
 			return BreakIterating
 		}

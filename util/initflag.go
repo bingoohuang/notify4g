@@ -4,14 +4,14 @@ import (
 	"fmt"
 	_ "net/http/pprof" // nolint G108
 	"os"
-	"path/filepath"
-	"strings"
 
+	"github.com/bingoohuang/gou/cnf"
+	"github.com/bingoohuang/gou/file"
 	"github.com/bingoohuang/gou/lo"
 
 	"github.com/bingoohuang/gou/htt"
 
-	"github.com/sirupsen/logrus"
+	"github.com/bingoohuang/gostarter/util"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -21,12 +21,11 @@ func InitFlags() {
 	ipo := pflag.BoolP("init", "i", false, "init to create template config file and ctl.sh")
 	pflag.StringP("addr", "a", ":11472", "http address to listen and serve")
 	configFile := pflag.StringP("config", "c", "./config.toml", "config file path")
-	pflag.StringP("loglevel", "l", "info", "debug/info/warn/error")
-	pflag.StringP("logdir", "d", "./var", "log dir")
 	pflag.StringP("auth", "u", "", "basic auth username and password eg admin:admin")
 	pflag.StringP("nopConfID", "", "nop", "nopConfID for no op testing")
-	pflag.BoolP("logrus", "o", true, "enable logrus")
 	pflag.StringP("snapshotDir", "s", "./etc/snapshots", "snapshots for config")
+
+	lo.DeclareLogPFlags()
 
 	pprofAddr := htt.PprofAddrPflag()
 
@@ -35,12 +34,7 @@ func InitFlags() {
 
 	pflag.Parse()
 
-	args := pflag.Args()
-	if len(args) > 0 {
-		fmt.Printf("Unknown args %s\n", strings.Join(args, " "))
-		pflag.PrintDefaults()
-		os.Exit(-1)
-	}
+	cnf.CheckUnknownPFlags()
 
 	if *help {
 		fmt.Printf("Built on %s from sha1 %s\n", Compile, Version)
@@ -56,7 +50,7 @@ func InitFlags() {
 
 	_ = viper.BindPFlags(pflag.CommandLine)
 
-	if fileExists(*configFile) {
+	if file.ExistsAsFile(*configFile) {
 		viper.SetConfigFile(*configFile)
 
 		if err := viper.ReadInConfig(); err != nil {
@@ -64,24 +58,5 @@ func InitFlags() {
 		}
 	}
 
-	if viper.GetBool("logrus") {
-		logdir := viper.GetString("logdir")
-		if err := os.MkdirAll(logdir, os.ModePerm); err != nil {
-			logrus.Panicf("failed to create %s error %v\n", logdir, err)
-		}
-
-		loglevel := viper.GetString("loglevel")
-		lo.InitLogger(loglevel, logdir, filepath.Base(os.Args[0])+".log")
-	} else {
-		logrus.SetLevel(logrus.DebugLevel)
-	}
-}
-
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-
-	return !info.IsDir()
+	util.InitGin(lo.SetupLog())
 }

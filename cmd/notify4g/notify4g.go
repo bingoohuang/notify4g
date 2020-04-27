@@ -46,8 +46,10 @@ func auth(fn http.HandlerFunc) http.HandlerFunc {
 		if !check(user, pass) {
 			w.Header().Set("WWW-Authenticate", `Basic realm="Notify4g Server"`)
 			http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+
 			return
 		}
+
 		fn(w, r)
 	}
 }

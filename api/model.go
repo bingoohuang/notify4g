@@ -1,5 +1,7 @@
 package api
 
+import "net/http"
+
 type NotifyRsp struct {
 	Status  int           `json:"status"`  // 状态,0成功
 	Message string        `json:"message"` // 消息
@@ -16,7 +18,7 @@ func MakeRsp(err error, ok bool, channel string, raw interface{}) NotifyRsp {
 	msg := ""
 
 	if ok {
-		status = 200
+		status = http.StatusOK
 		msg = "OK"
 	}
 

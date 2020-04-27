@@ -85,7 +85,7 @@ func (s AliyunSms) ConvertRequest(r *SmsReq) Request {
 
 // api doc: https://help.aliyun.com/document_detail/101414.html?spm=a2c4g.11186623.6.616.1eee202a1PxPlf
 func (s AliyunSms) createParams(req *AliyunSmsReq) (map[string]string, string) {
-	outID := ran.String(16)
+	outID := ran.String(16) // nolint gomnd
 	param := map[string]string{
 		"SignatureMethod":  "HMAC-SHA1", // 以下 系统参数
 		"SignatureNonce":   uuid.New(),
@@ -99,7 +99,7 @@ func (s AliyunSms) createParams(req *AliyunSmsReq) (map[string]string, string) {
 		"RegionId":      "cn-hangzhou",
 		"PhoneNumbers":  strings.Join(req.Mobiles, ","),
 		"SignName":      str.EmptyThen(req.SignName, s.SignName),
-		"TemplateParam": enc.JSON(Filter(req.TemplateParams)),
+		"TemplateParam": enc.JSON(AbbreviateValues(req.TemplateParams, 20)),
 		"TemplateCode":  str.EmptyThen(req.TemplateCode, s.TemplateCode),
 		"OutID":         outID}
 	str := "" // 3. 构造待签名的字符串
@@ -114,10 +114,10 @@ func (s AliyunSms) createParams(req *AliyunSmsReq) (map[string]string, string) {
 	return param, outID
 }
 
-func Filter(m map[string]string) interface{} {
+func AbbreviateValues(m map[string]string, max int) interface{} {
 	for k, v := range m {
-		if len(v) >= 20 {
-			m[k] = v[0:19] + "…"
+		if len(v) >= max {
+			m[k] = v[:max-1] + "…"
 		}
 	}
 

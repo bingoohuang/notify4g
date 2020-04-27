@@ -9,16 +9,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/bingoohuang/gou/file"
+
 	"github.com/bingoohuang/statiq/fs"
 )
 
 func InitCtl(sfs *fs.StatiqFS, ctlTplName, ctlFilename string) error {
-	exists, err := FileStat(ctlFilename)
-	if err != nil {
-		return err
-	}
-
-	if exists == Exists {
+	if file.ExistsAsFile(ctlFilename) {
 		fmt.Println(ctlFilename + " already exists, ignored!")
 		return nil
 	}
@@ -51,7 +48,7 @@ func InitCtl(sfs *fs.StatiqFS, ctlTplName, ctlFilename string) error {
 }
 
 func argsExcludeInit() []string {
-	binArgs := make([]string, 0, len(os.Args)-2)
+	binArgs := make([]string, 0, len(os.Args)-2) // nolint gomnd
 
 	for i, arg := range os.Args {
 		if i == 0 {
