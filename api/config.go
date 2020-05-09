@@ -141,17 +141,24 @@ func (a *App) prepareNotify(w http.ResponseWriter, configID string) error {
 func (a *App) postNotify(w http.ResponseWriter, r *http.Request, configID string) error {
 	c := a.configCache.Read(configID)
 	if c == nil {
+		logrus.Warnf("failed to find config for %s", configID)
 		return WriteErrorJSON(http.StatusNotFound, w,
 			Rsp{Status: http.StatusNotFound, Message: "configID " + configID + " not found"})
 	}
 
 	req := c.Config.NewRequest()
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+		logrus.Warnf("failed to decode request error: %v", err)
+
 		return WriteErrorJSON(http.StatusBadRequest, w,
 			Rsp{Status: http.StatusBadRequest, Message: err.Error()})
 	}
 
+	logrus.Info("got request: %v", req)
+
 	rsp := a.NotifyByConfigID(configID, req)
+
+	logrus.Info("response: %v", rsp)
 
 	return WriteJSON(w, rsp)
 }
@@ -164,7 +171,7 @@ func (a *App) NotifyByConfigID(configID string, req Request) NotifyRsp {
 
 	list := a.configCache.ReadRedList()
 	if !req.FilterRedList(list.prepare()) {
-		return MakeRsp(errors.Errorf("target is empty after redlist filtered"),
+		return MakeRsp(errors.Errorf("target is empty after redlist %v filtered", list),
 			false, "NA", nil)
 	}
 
