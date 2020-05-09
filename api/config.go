@@ -154,11 +154,11 @@ func (a *App) postNotify(w http.ResponseWriter, r *http.Request, configID string
 			Rsp{Status: http.StatusBadRequest, Message: err.Error()})
 	}
 
-	logrus.Info("got request: %v", req)
+	logrus.Info("got request: %+v", req)
 
 	rsp := a.NotifyByConfigID(configID, req)
 
-	logrus.Info("response: %v", rsp)
+	logrus.Info("response: %+v", rsp)
 
 	return WriteJSON(w, rsp)
 }
