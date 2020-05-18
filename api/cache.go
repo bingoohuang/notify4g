@@ -3,8 +3,7 @@ package api
 import (
 	"encoding/json"
 
-	"github.com/bingoohuang/goreflect"
-
+	"github.com/bingoohuang/gor"
 	"github.com/patrickmn/go-cache"
 	"github.com/sirupsen/logrus"
 )
@@ -114,7 +113,7 @@ func (t *NotifyConfigCache) Delete(key string) {
 
 func (t *NotifyConfigCache) Walk(fn func(k string, v *NotifyConfig)) {
 	items := t.C.Items()
-	keys := goreflect.MapKeys(items)
+	keys := gor.MapKeys(items)
 
 	for _, ki := range keys {
 		vi := items[ki]

@@ -5,7 +5,7 @@ go 1.12
 require (
 	github.com/bingoohuang/faker v0.0.0-20191122080657-247fa98a3272
 	github.com/bingoohuang/gonet v0.0.0-20191125104325-28d67509f1a2
-	github.com/bingoohuang/goreflect v0.0.0-20190712052741-f9e6d0b5f7fd
+	github.com/bingoohuang/gor v0.0.0-20200321095356-94cf6290c6ea
 	github.com/bingoohuang/gostarter v0.0.0-20200427022055-adbdb70bbdba
 	github.com/bingoohuang/gou v0.0.0-20200427032537-c6c7084c9fdf
 	github.com/bingoohuang/now v0.0.0-20190715150822-ba8e4a91e3d9

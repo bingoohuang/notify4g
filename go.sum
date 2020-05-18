@@ -19,8 +19,6 @@ github.com/bingoohuang/gonet v0.0.0-20191125104325-28d67509f1a2 h1:vbD/5qZGTrupy
 github.com/bingoohuang/gonet v0.0.0-20191125104325-28d67509f1a2/go.mod h1:vNeu6I/zpzA/kYOF6I8pOt4EtmmFTa1JhZ1YOl5IFn4=
 github.com/bingoohuang/gor v0.0.0-20200321095356-94cf6290c6ea h1:DGdKt4f+BciAcqlJ7v7LHCTO3wXBqeItwaLXKea4GjI=
 github.com/bingoohuang/gor v0.0.0-20200321095356-94cf6290c6ea/go.mod h1:ahEOivpxL+rGjwq6hk2H8aQEMh/Uc6r1N3ohugldIww=
-github.com/bingoohuang/goreflect v0.0.0-20190712052741-f9e6d0b5f7fd h1:horohKpjOxu/ZiHUzDhMbfoUgthbXoiCEI2SvWkOVL4=
-github.com/bingoohuang/goreflect v0.0.0-20190712052741-f9e6d0b5f7fd/go.mod h1:rga5AtVf7Npiv04XZxTsd8LC4/VyEHr+sn4Vt1jWPNE=
 github.com/bingoohuang/gostarter v0.0.0-20200427022055-adbdb70bbdba h1:B37iG1aSHPIXZOP9KGUeBMd58yRDJ8p9cwDUZLysfcY=
 github.com/bingoohuang/gostarter v0.0.0-20200427022055-adbdb70bbdba/go.mod h1:CuGdQs6n1U0pykeE4fDhfbcGJFTp2OrFO9pyA3AnvAU=
 github.com/bingoohuang/gou v0.0.0-20200427021007-1689ff545c0c h1:DkCqiUVlAYsQ+9MqWGNSrR/koZJsaJwgdk2QvTg1I44=
@@ -44,7 +42,6 @@ github.com/coreos/etcd v3.3.10+incompatible/go.mod h1:uF7uidLiAD3TWHmW31ZFd/JWoc
 github.com/coreos/go-semver v0.2.0/go.mod h1:nnelYz7RCh+5ahJtPPxZlU+153eP4D4r3EedlOD2RNk=
 github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
 github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f/go.mod h1:E3G3o1h8I7cfcXa63jLwjI0eiQQMgzzUDFVpN/nH/eA=
-github.com/darkgopher/dark v0.0.0-20170224201535-cf742fb983cd/go.mod h1:SYwg8Os6cs59oG7X6auHuPD8AJwJ60EmJd9YsuNF61g=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -223,8 +220,6 @@ github.com/tdewolff/parse v2.3.4+incompatible h1:x05/cnGwIMf4ceLuDMBOdQ1qGniMoxp
 github.com/tdewolff/parse v2.3.4+incompatible/go.mod h1:8oBwCsVmUkgHO8M5iCzSIDtpzXOT0WXX9cWhz+bIzJQ=
 github.com/tdewolff/test v1.0.6 h1:76mzYJQ83Op284kMT+63iCNCI7NEERsIN8dLM+RiKr4=
 github.com/tdewolff/test v1.0.6/go.mod h1:6DAvZliBAAnD7rhVgwaM7DE5/d9NMOAJ09SqYqeK4QE=
-github.com/thoas/go-funk v0.4.0 h1:KBaa5NL7NMtsFlQaD8nQMbDt1wuM+OOaNQyYNYQFhVo=
-github.com/thoas/go-funk v0.4.0/go.mod h1:mlR+dHGb+4YgXkf13rkQTuzrneeHANxOm6+ZnEV9HsA=
 github.com/thoas/go-funk v0.5.0 h1:XXFUVqX6xnIDqXxENFHBFS1X5AoT0EDs7HJq2krRfD8=
 github.com/thoas/go-funk v0.5.0/go.mod h1:+IWnUfUmFO1+WVYQWQtIJHeRRdaIyyYglZN7xzUPe4Q=
 github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=

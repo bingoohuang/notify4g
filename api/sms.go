@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bingoohuang/goreflect"
+	"github.com/bingoohuang/gor"
+
 	"github.com/bingoohuang/gou/ran"
 
 	"github.com/bingoohuang/gou/str"
@@ -97,7 +98,7 @@ func (r Sms) Notify(app *App, request Request) NotifyRsp {
 		return BreakIterating
 	}
 
-	goreflect.IterateSlice(r.ConfigIds, r.startIndex(), f)
+	gor.IterateSlice(r.ConfigIds, r.startIndex(), f)
 
 	return MakeRsp(err, succ, channelName, rsp)
 }

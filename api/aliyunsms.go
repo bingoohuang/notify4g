@@ -3,7 +3,8 @@ package api
 import (
 	"net/url"
 
-	"github.com/bingoohuang/goreflect"
+	"github.com/bingoohuang/gor"
+
 	"github.com/bingoohuang/gou/enc"
 	"github.com/bingoohuang/gou/ran"
 	"github.com/bingoohuang/gou/str"
@@ -104,7 +105,7 @@ func (s AliyunSms) createParams(req *AliyunSmsReq) (map[string]string, string) {
 		"OutID":         outID}
 	str := "" // 3. 构造待签名的字符串
 
-	goreflect.WalkMap(param, func(k, v string) { str += "&" + encx(k) + "=" + encx(v) })
+	gor.WalkMap(param, func(k, v string) { str += "&" + encx(k) + "=" + encx(v) })
 
 	toSign := "GET&" + encx("/") + "&" + encx(str[1:])
 	logrus.Debugf("toSign:【%s】", toSign)
