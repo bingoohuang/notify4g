@@ -30,8 +30,8 @@ func (q *Mail) Config(config string) error {
 }
 
 func (q *Mail) InitMeaning() {
-	q.SMTPAddr = "SMTP地址"
-	q.SMTPPort = 587       // 587
+	q.SMTPAddr = "SMTP地址, 非SSL默认25端口，SSL默认465端口，阿里云默认587端口"
+	q.SMTPPort = 465       // 587, 465 要求强制 SSL 安全链接
 	q.From = `发送人地址`       // ...@gmail.com
 	q.Username = `邮箱登录用户名` // ...
 	q.Pass = `邮箱登录密码`      // ...
