@@ -42,6 +42,7 @@ func HandleHome(app *App, homeTemplate string) func(w http.ResponseWriter, r *ht
 			{Name: "腾讯云语音", Channel: qcloudvoice, ConfigIDs: findConfigIDs(ids, qcloudvoice)},
 			{Name: "企业微信", Channel: qywx, ConfigIDs: findConfigIDs(ids, qywx)},
 			{Name: "SMTP邮件", Channel: mail, ConfigIDs: findConfigIDs(ids, mail)},
+			{Name: "Exchange邮件", Channel: exchangewebservice, ConfigIDs: findConfigIDs(ids, exchangewebservice)},
 			{Name: "聚合短信", Channel: sms, ConfigIDs: findConfigIDs(ids, sms)},
 			{Name: "阿里大鱼短信", Channel: aliyundayusms, ConfigIDs: findConfigIDs(ids, aliyundayusms)},
 		}

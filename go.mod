@@ -14,6 +14,7 @@ require (
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/magiconair/properties v1.8.1
 	github.com/mattn/go-isatty v0.0.10 // indirect
+	github.com/mhewedy/ews v1.0.15
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pelletier/go-toml v1.6.0 // indirect

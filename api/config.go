@@ -84,9 +84,16 @@ type NotifyConfig struct {
 }
 
 func NewConfig(typ string) (Config, error) {
-	v := str.Decode(typ, "aliyunsms", &AliyunSms{}, "dingtalkrobot", &Dingtalk{},
-		"qcloudsms", &QcloudSms{}, "qcloudvoice", &QcloudVoice{}, "qywx", &Qywx{}, "mail", &Mail{}, "sms", &Sms{},
-		"aliyundayusms", &AliyunDaYuSms{})
+	v := str.Decode(typ,
+		aliyunsms, &AliyunSms{},
+		dingtalkrobot, &Dingtalk{},
+		qcloudsms, &QcloudSms{},
+		qcloudvoice, &QcloudVoice{},
+		qywx, &Qywx{},
+		mail, &Mail{},
+		exchangewebservice, &ExchangeWebService{},
+		sms, &Sms{},
+		aliyundayusms, &AliyunDaYuSms{})
 	if v != nil {
 		return v.(Config), nil
 	}
