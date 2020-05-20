@@ -1,6 +1,8 @@
 package api
 
 import (
+	"crypto/tls"
+
 	"github.com/bingoohuang/gou/str"
 	"gopkg.in/gomail.v2"
 
@@ -62,6 +64,7 @@ func (q Mail) Notify(_ *App, request Request) NotifyRsp {
 	mm.SetBody("text/html", r.Message)
 
 	d := gomail.NewDialer(q.SMTPAddr, q.SMTPPort, q.Username, q.Pass)
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true} // nolints
 
 	// Notify the email to Bob, Cora and Dan.
 	err := d.DialAndSend(mm)
