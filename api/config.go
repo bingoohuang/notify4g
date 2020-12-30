@@ -121,9 +121,9 @@ func (a *App) NotifyByConfig(removePath string) func(w http.ResponseWriter, r *h
 		}
 
 		switch r.Method {
-		case GET:
+		case http.MethodGet:
 			_ = a.prepareNotify(w, configID)
-		case POST:
+		case http.MethodPost:
 			_ = a.postNotify(w, r, configID)
 		default:
 			_ = WriteErrorJSON(http.StatusNotFound, w,
@@ -193,11 +193,11 @@ func (a *App) ServeByConfig(path string) func(w http.ResponseWriter, r *http.Req
 		l := len(subs)
 
 		switch r.Method {
-		case GET:
+		case http.MethodGet:
 			_ = a.GetConfig(w, l, subs)
-		case POST:
+		case http.MethodPost:
 			_ = a.PostConfig(w, r, l, subs)
-		case "DELETE":
+		case http.MethodDelete:
 			_ = a.DeleteConfig(w, l, subs)
 		default:
 			_ = WriteErrorJSON(http.StatusNotFound, w,
@@ -230,7 +230,6 @@ func (a *App) PostConfig(w http.ResponseWriter, r *http.Request, l int, subs []s
 
 	content := gonet.ReadBytes(r.Body)
 	config, err := ParseNotifyConfig(content)
-
 	if err != nil {
 		return WriteErrorJSON(http.StatusBadRequest, w,
 			Rsp{Status: http.StatusBadRequest, Message: err.Error()})

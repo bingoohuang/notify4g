@@ -32,11 +32,8 @@ func NewCache(snapshotDir string) *NotifyConfigCache {
 func (t *NotifyConfigCache) write(k string, v interface{}, writeSnapshot bool) error {
 	t.C.SetDefault(k, v)
 
-	var bytes []byte
-
-	var err error
-
-	if bytes, err = json.Marshal(v); err != nil {
+	bytes, err := json.Marshal(v)
+	if err != nil {
 		return err
 	}
 

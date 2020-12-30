@@ -151,10 +151,10 @@ func (r SmsTester) Send(app *App) NotifyRsp            { return r.Config.Notify(
 func HandleRedlist(a *App) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
-		case GET:
+		case http.MethodGet:
 			list := a.configCache.ReadRedList()
 			_ = WriteJSON(w, list)
-		case POST:
+		case http.MethodPost:
 			var list RedList
 			if err := json.NewDecoder(r.Body).Decode(&list); err != nil {
 				_ = WriteErrorJSON(http.StatusBadRequest, w,
@@ -192,11 +192,10 @@ func handleRawInternal(app *App, path string, w http.ResponseWriter, r *http.Req
 	}
 
 	switch r.Method {
-	case GET:
+	case http.MethodGet:
 		_ = faker.Fake(tester)
-
 		return WriteJSON(w, tester)
-	case POST:
+	case http.MethodPost:
 		if err := json.NewDecoder(r.Body).Decode(tester); err != nil {
 			return WriteErrorJSON(http.StatusBadRequest, w,
 				Rsp{Status: http.StatusBadRequest, Message: err.Error()})
