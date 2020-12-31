@@ -30,6 +30,7 @@ $(function () {
             processData: false,
             data: redlistEditor.getValue(),
             success: function (content) {
+                alert('Successful!')
             },
             error: ajaxError
         })
@@ -142,6 +143,7 @@ $(function () {
                 data: reqEditor.getValue(),
                 success: function (content) {
                     rspEditor.setValue(JSON.stringify(content, null, 4))
+                    alert('Successful!')
                 },
                 error: ajaxError
             })
@@ -153,6 +155,7 @@ $(function () {
                 data: reqEditor.getValue(),
                 success: function (content) {
                     rspEditor.setValue(JSON.stringify(content, null, 4))
+                    alert('Successful!')
                 },
                 error: ajaxError
             })
@@ -164,6 +167,7 @@ $(function () {
                 data: reqEditor.getValue(),
                 success: function (content) {
                     rspEditor.setValue(JSON.stringify(content, null, 4))
+                    alert('Successful!')
                 },
                 error: ajaxError
             })
@@ -177,6 +181,7 @@ $(function () {
             success: function (content) {
                 rspEditor.setValue(JSON.stringify(content, null, 4))
                 document.location.reload()
+                alert('Successful!')
             },
             error: ajaxError
         })

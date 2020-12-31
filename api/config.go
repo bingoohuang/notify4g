@@ -162,9 +162,7 @@ func (a *App) postNotify(w http.ResponseWriter, r *http.Request, configID string
 	}
 
 	logrus.Infof("got request: %+v", req)
-
 	rsp := a.NotifyByConfigID(configID, req)
-
 	logrus.Infof("response: %+v", rsp)
 
 	return WriteJSON(w, rsp)

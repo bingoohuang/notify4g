@@ -2,12 +2,13 @@ package util
 
 import (
 	"fmt"
+	"github.com/bingoohuang/golog"
 	_ "net/http/pprof" // nolint G108
 	"os"
+	"path/filepath"
 
 	"github.com/bingoohuang/gou/cnf"
 	"github.com/bingoohuang/gou/file"
-	"github.com/bingoohuang/gou/lo"
 
 	"github.com/bingoohuang/gou/htt"
 
@@ -24,8 +25,7 @@ func InitFlags() {
 	pflag.StringP("auth", "u", "", "basic auth username and password eg admin:admin")
 	pflag.StringP("nopConfID", "", "nop", "nopConfID for no op testing")
 	pflag.StringP("snapshotDir", "s", "./etc/snapshots", "snapshots for config")
-
-	lo.DeclareLogPFlags()
+	pflag.StringP("logdir", "", "", "log dir")
 
 	pprofAddr := htt.PprofAddrPflag()
 
@@ -58,5 +58,13 @@ func InitFlags() {
 		}
 	}
 
-	util.InitGin(lo.SetupLog())
+	appName := filepath.Base(os.Args[0])
+	logdir := viper.GetString("logdir")
+	if logdir == "" {
+		logdir = file.HomeDirExpand("~/logs")
+	}
+
+	spec := fmt.Sprintf("file=%s/%s.log", logdir, appName)
+	gl := golog.SetupLogrus(golog.Spec(spec))
+	util.InitGin(gl.Writer)
 }

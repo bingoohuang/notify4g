@@ -30,9 +30,13 @@ type HomeData struct {
 func HandleHome(app *App, homeTemplate string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ids := coll.MakeMultiMap()
+		keys := make(map[string]bool)
 
 		app.configCache.Walk(func(k string, v *NotifyConfig) {
-			ids.Put(v.Type, k)
+			if _, ok := keys[k]; !ok { // 相同key不覆盖
+				keys[k] = true
+				ids.Put(v.Type, k)
+			}
 		})
 
 		items := []NotifierItem{
@@ -130,14 +134,14 @@ type SmsTester struct {
 
 var _ Tester = (*SmsTester)(nil)
 
-func (r AlidayuTester) FilterRedList(list redList) bool        { return r.Data.FilterRedList(list) }
-func (r AliyunsmsTester) FilterRedList(list redList) bool      { return r.Data.FilterRedList(list) }
-func (r DingtalkReqTester) FilterRedList(list redList) bool    { return r.Data.FilterRedList(list) }
-func (r QcloudSmsReqTester) FilterRedList(list redList) bool   { return r.Data.FilterRedList(list) }
-func (r QcloudSmsVoiceTester) FilterRedList(list redList) bool { return r.Data.FilterRedList(list) }
-func (r QywxTester) FilterRedList(list redList) bool           { return r.Data.FilterRedList(list) }
-func (r MailTester) FilterRedList(list redList) bool           { return r.Data.FilterRedList(list) }
-func (r SmsTester) FilterRedList(list redList) bool            { return r.Data.FilterRedList(list) }
+func (r *AlidayuTester) FilterRedList(list redList) bool        { return r.Data.FilterRedList(list) }
+func (r *AliyunsmsTester) FilterRedList(list redList) bool      { return r.Data.FilterRedList(list) }
+func (r *DingtalkReqTester) FilterRedList(list redList) bool    { return r.Data.FilterRedList(list) }
+func (r *QcloudSmsReqTester) FilterRedList(list redList) bool   { return r.Data.FilterRedList(list) }
+func (r *QcloudSmsVoiceTester) FilterRedList(list redList) bool { return r.Data.FilterRedList(list) }
+func (r *QywxTester) FilterRedList(list redList) bool           { return r.Data.FilterRedList(list) }
+func (r *MailTester) FilterRedList(list redList) bool           { return r.Data.FilterRedList(list) }
+func (r *SmsTester) FilterRedList(list redList) bool            { return r.Data.FilterRedList(list) }
 
 func (r AlidayuTester) Send(app *App) NotifyRsp        { return r.Config.Notify(app, &r.Data) }
 func (r AliyunsmsTester) Send(app *App) NotifyRsp      { return r.Config.Notify(app, &r.Data) }
@@ -221,10 +225,8 @@ func newTester(a *App, configType string) Tester {
 		mail, &MailTester{}, sms, &SmsTester{}); v != nil {
 		tester := v.(Tester)
 		list := a.configCache.ReadRedList()
-
-		if tester.FilterRedList(list.prepare()) {
-			return tester
-		}
+		tester.FilterRedList(list.prepare())
+		return tester
 	}
 
 	return nil

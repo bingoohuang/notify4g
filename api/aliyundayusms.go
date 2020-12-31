@@ -67,7 +67,7 @@ func (s AliyunDaYuSms) Notify(_ *App, request Request) NotifyRsp {
 	client := NewTopClient(s.AppKey, s.AppSecret)
 	param := s.createParams(req)
 	response, err := client.Execute(param)
-	logrus.Debugf("response:【%+v】,error:【%+v】", response, err)
+	logrus.Infof("request:%+v,response:【%+v】,error:【%+v】", req, response, err)
 
 	var rsp AliyunDaYuSmsRsp
 	err = json.Unmarshal([]byte(response), &rsp)

@@ -1,0 +1,25 @@
+Addr=":11471"
+Auth="admin:1qazzaq1"
+#SnapshotDir="/etc/notify4g/snapshots"
+#Logdir="/var/log/notify4g"
+
+# 数据库
+DriverName = "mysql"
+DSN = "root:pass@tcp(127.0.0.1:3306)/mydb?charset=utf8"
+# 刷新间隔，更新配置
+RefreshInterval = "60s"
+# 以key查询value
+GetSQL = "select v from kv where k = '{{.Key}}' and state = 1"
+# 更新key关联的值
+SetSQL = "insert into kv(k, v, state, created) values('{{.Key}}', '{{.Value}}', 1, '{{.Time}}')  on duplicate key update v = '{{.Value}}', updated = '{{.Time}}', state = 1"
+# 删除key关联的值
+DelSQL = "update kv set state = 0, updated = '{{.Time}}' where k = '{{.Key}}' and state = 1"
+
+#create table kv
+#(
+#    k       varchar(100) not null primary key,
+#    v       text,
+#    state   tinyint      not null default 1,
+#    updated datetime,
+#    created datetime     not null
+#)
